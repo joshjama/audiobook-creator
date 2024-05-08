@@ -1,31 +1,8 @@
-= Audiobook Creator - Readme
-@Author : Joshua Jama
-@Date : 8.5.2024
-@Category : Readme
-
-== What is Audiobook Creator?
-
-* This project creates audiobooks from plain text files.
-* It uses the Python TTS and xTTS models to synthesize natural human-sounding audio.
-
-== Requirements :
-
-.Requirements :
-* python3.10-pip
-* python3-virtualenv
-
-== Installation :
-
-.Installation :
-* Just run the following to install the Python modules
-* $ ./install_requirements.sh
-
-== Usage :
+Usage :
 
 .Usage :
 * Just run the following to create an audiobook containing several audio - wav files.
-* $ source ./audiobook_venv/bin/activate &&
-* $ python CreateAudiobook.py <PATH_TO_YOUR_TXT.txt> <Language_code> <AUDIO_BOOK_NAME>
+* $ ./create_audiobook.sh <PATH_TO_YOUR_TEXT> <LANGUAGE_CODE> <AUDIOBOOK_NAME> 
 * It will create a folder with your AUDIO_BOOK_NAME, create audio files from your text, and place them into this folder.
 * Please note that you will need a CUDA-capable GPU in order to run the voices as they work with deep neural networks in order to provide high-quality TTS.
 
