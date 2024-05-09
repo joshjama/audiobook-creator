@@ -1,3 +1,27 @@
+= Audiobook Creator - Readme  
+@Date : 8.5.2024  
+@Category : Readme  
+
+== What is Audiobook Creator?  
+
+* This project creates audiobooks from plain text files.  
+* It uses the Python TTS and xTTS models to synthesize natural human-sounding audio.  
+* Powered by TTS and XTTS 
+
+== Requirements :  
+
+.Requirements :  
+* python3.10-pip  
+* python3-virtualenv  
+
+== Installation :  
+
+.Installation :  
+* Just run the following to install the Python modules  
+* $ ./install_requirements.sh  
+
+== Usage :  
+
 Usage :
 
 .Usage :
