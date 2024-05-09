@@ -20,7 +20,7 @@ def create_audio_tts(text_file_path, LANGUAGE='en', book_name="Example_book") :
 
   # Text, der in Sprache umgewandelt werden soll
   text = read_text_from_file(text_file_path)
-  text_chunks = split_string_into_chunks(text, 200)
+  text_chunks = split_string_into_chunks(text, 1500)
   for index, chunk in enumerate(text_chunks) :
 
     # Umwandlung des Textes in Sprache und Speicherung in einer Datei
