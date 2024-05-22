@@ -26,7 +26,16 @@ Usage :
 
 .Usage :
 * Just run the following to create an audiobook containing several audio - wav files.
-* $ ./create_audiobook.sh <PATH_TO_YOUR_TEXT> <LANGUAGE_CODE> <AUDIOBOOK_NAME> 
+* $ ./create_audiobook.sh <PATH_TO_YOUR_TEXT> <AUDIOBOOK_NAME> 
 * It will create a folder with your AUDIO_BOOK_NAME, create audio files from your text, and place them into this folder.
 * Please note that you will need a CUDA-capable GPU in order to run the voices as they work with deep neural networks in order to provide high-quality TTS.
+
+== Supported Languages : 
+
+.Currently we support : 
+* German 
+* English 
+
+* We will add more languages in later releases. 
+* We need to download a spacy model for each language in order to split the book to sentences correctly. 
 
