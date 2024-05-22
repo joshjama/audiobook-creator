@@ -1,0 +1,4 @@
+pydub
+TTS
+spacy 
+langdetect 
