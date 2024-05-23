@@ -29,7 +29,7 @@ def split_text_into_sentences(text: str, max_length: int = 250) -> list:
   nlp = load_model(language_code)
   nlp.max_length = len(text) + 1
   try: 
-  doc = nlp(text)
+    doc = nlp(text)
   except MemoryError:
     print("A MemoryError occurred. This usually means the system ran out of memory. Please try reducing the size of your input or closing other applications to free up memory.", file=sys.stderr )
     print("A MemoryError occurred while trying to process the text with spaCy. The text may be too long to fit into available RAM. Please try reducing the text size or increasing the available memory.", file=sys.stderr )
@@ -43,7 +43,8 @@ def split_text_into_sentences(text: str, max_length: int = 250) -> list:
       current_chunk += sent.text + " "
     else:
       sentences.append(current_chunk.strip())
-     current_chunk = sent.text + " "
+      current_chunk = sent.text + " "
+
   if current_chunk:
     sentences.append(current_chunk.strip())
     
