@@ -13,6 +13,9 @@ from spacy.language import Language
 ## Usage : 
 #$ python ./CreateAudiobook.py /PATH_TO_TEXT your_books_name  
 
+# Language of the given Textfile : 
+TEXT_LANGUAGE = "en" 
+
 def load_model(language_code: str) -> Language:
   """Lädt das spaCy-Modell basierend auf dem Sprachcode."""
   if language_code == "de":
@@ -92,16 +95,16 @@ def create_audio_tts(text_file_path, LANGUAGE='en', book_name="Example_book") :
 
 
 def read_text_from_file(file_path) : 
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read()
-            return text
-    except FileNotFoundError:
-        print("The file was not found.")
-        return None
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
+  global TEXT_LANGUAGE 
+  try:
+    with open(file_path, 'r', encoding='utf-8') as file:
+      text = file.read()
+      language_code = detect(text)
+      TEXT_LANGUAGE = language_code
+      return text
+  except FileNotFoundError:
+    print("The file was not found.")
+    return None
 
 # Split the input text to chunks of 200 characters. 
 def split_string_into_chunks(input_string, chunk_size) :
@@ -173,4 +176,4 @@ def create_directory_from_book_name(book_name="Example_book") :
 
 
 if __name__ == "__main__": 
-  create_audio_tts(sys.argv[1], sys.argv[2]) 
+  create_audio_tts(sys.argv[1], TEXT_LANGUAGE, sys.argv[2]) 
