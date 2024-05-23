@@ -15,6 +15,8 @@ from spacy.language import Language
 
 # Language of the given Textfile : 
 TEXT_LANGUAGE = "en" 
+# States if the texts language was given by a cli argument. 
+text_language_set_externaly = None 
 
 def load_model(language_code: str) -> Language:
   """Lädt das spaCy-Modell basierend auf dem Sprachcode."""
@@ -28,7 +30,7 @@ def load_model(language_code: str) -> Language:
 
 def split_text_into_sentences(text: str, max_length: int = 250) -> list:
   """Teilt den Text in Sätze, mit Berücksichtigung der maximalen Länge."""
-  language_code = detect(text)
+  language_code = TEXT_LANGUAGE  
   nlp = load_model(language_code)
   nlp.max_length = len(text) + 1
   try: 
@@ -75,10 +77,12 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
   # Text, der in Sprache umgewandelt werden soll
   text = read_text_from_file(text_file_path)
   if LANGUAGE == "en" or LANGUAGE == "de" : 
-    LANGUAGE = detect(text)
+    #LANGUAGE = detect(text)
+    LANGUAGE = TEXT_LANGUAGE 
     print("Detected language : ", LANGUAGE )
     text_chunks = split_text_into_sentences(text) 
   else : 
+    LANGUAGE = TEXT_LANGUAGE 
     print("Attension ! unsupported Language ! The text you insurted is not in one of the supported languages and will therefore not be splitted to sentences correctly. ")
     text_chunks = split_string_into_chunks(text, 1500)
   for index, chunk in enumerate(text_chunks) :
@@ -104,7 +108,9 @@ def read_text_from_file(file_path) :
     with open(file_path, 'r', encoding='utf-8') as file:
       text = file.read()
       language_code = detect(text)
-      TEXT_LANGUAGE = language_code
+      if not text_language_set_externaly : 
+        TEXT_LANGUAGE = language_code
+      
       return text
   except FileNotFoundError:
     print("The file was not found.")
@@ -186,4 +192,7 @@ if __name__ == "__main__":
     book_name = sys.argv[2] 
   else:  
     book_name = "Audiobook" 
+  if sys.argv[len(sys.argv) - 2 ] == "--language" : 
+    TEXT_LANGUAGE = sys.argv[ len(sys.argv) - 1 ] 
+    text_language_set_externaly = True 
   create_audio_tts(sys.argv[1], TEXT_LANGUAGE, book_name) 
