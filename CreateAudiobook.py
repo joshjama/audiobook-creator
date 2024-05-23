@@ -11,7 +11,7 @@ from langdetect import detect
 from spacy.language import Language
 
 ## Usage : 
-#$ python ./CreateAudiobook.py /PATH_TO_TEXT language your_books_name  
+#$ python ./CreateAudiobook.py /PATH_TO_TEXT your_books_name  
 
 def load_model(language_code: str) -> Language:
     """Lädt das spaCy-Modell basierend auf dem Sprachcode."""
@@ -28,7 +28,11 @@ def split_text_into_sentences(text: str, max_length: int = 250) -> list:
     language_code = detect(text)
     nlp = load_model(language_code)
     nlp.max_length = len(text) + 1
-    doc = nlp(text)
+    try: 
+      doc = nlp(text)
+    except MemoryError:
+      print("A MemoryError occurred. This usually means the system ran out of memory. Please try reducing the size of your input or closing other applications to free up memory.")
+      print("A MemoryError occurred while trying to process the text with spaCy. The text may be too long to fit into available RAM. Please try reducing the text size or increasing the available memory.")
     
     sentences = []
     current_chunk = ""
