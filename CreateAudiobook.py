@@ -14,39 +14,40 @@ from spacy.language import Language
 #$ python ./CreateAudiobook.py /PATH_TO_TEXT your_books_name  
 
 def load_model(language_code: str) -> Language:
-    """Lädt das spaCy-Modell basierend auf dem Sprachcode."""
-    if language_code == "de":
-        return spacy.load("de_core_news_sm")
-    elif language_code == "en":
-        return spacy.load("en_core_web_sm")
-    # Fügen Sie hier weitere Sprachen und Modelle hinzu
-    else:
-        raise ValueError(f"Kein Modell für die Sprache {language_code} verfügbar.")
+  """Lädt das spaCy-Modell basierend auf dem Sprachcode."""
+  if language_code == "de":
+    return spacy.load("de_core_news_sm")
+  elif language_code == "en":
+    return spacy.load("en_core_web_sm")
+  # Fügen Sie hier weitere Sprachen und Modelle hinzu
+  else:
+    raise ValueError(f"Kein Modell für die Sprache {language_code} verfügbar.")
 
 def split_text_into_sentences(text: str, max_length: int = 250) -> list:
-    """Teilt den Text in Sätze, mit Berücksichtigung der maximalen Länge."""
-    language_code = detect(text)
-    nlp = load_model(language_code)
-    nlp.max_length = len(text) + 1
-    try: 
-      doc = nlp(text)
-    except MemoryError:
-      print("A MemoryError occurred. This usually means the system ran out of memory. Please try reducing the size of your input or closing other applications to free up memory.")
-      print("A MemoryError occurred while trying to process the text with spaCy. The text may be too long to fit into available RAM. Please try reducing the text size or increasing the available memory.")
+  """Teilt den Text in Sätze, mit Berücksichtigung der maximalen Länge."""
+  language_code = detect(text)
+  nlp = load_model(language_code)
+  nlp.max_length = len(text) + 1
+  try: 
+  doc = nlp(text)
+  except MemoryError:
+    print("A MemoryError occurred. This usually means the system ran out of memory. Please try reducing the size of your input or closing other applications to free up memory.", file=sys.stderr )
+    print("A MemoryError occurred while trying to process the text with spaCy. The text may be too long to fit into available RAM. Please try reducing the text size or increasing the available memory.", file=sys.stderr )
+    sys.exit(1)  
     
-    sentences = []
-    current_chunk = ""
+  sentences = []
+  current_chunk = ""
     
-    for sent in doc.sents:
-        if len(current_chunk) + len(sent.text) <= max_length or len(sent.text) > max_length:
-            current_chunk += sent.text + " "
-        else:
-            sentences.append(current_chunk.strip())
-            current_chunk = sent.text + " "
-    if current_chunk:
-        sentences.append(current_chunk.strip())
+  for sent in doc.sents:
+    if len(current_chunk) + len(sent.text) <= max_length or len(sent.text) > max_length:
+      current_chunk += sent.text + " "
+    else:
+      sentences.append(current_chunk.strip())
+     current_chunk = sent.text + " "
+  if current_chunk:
+    sentences.append(current_chunk.strip())
     
-    return sentences
+  return sentences
 
 # Beispieltext
 #text = "Hier ist ein langer Text, der in Sätze unterteilt werden soll. Dieser Text ist speziell dafür gedacht, um die Funktionsweise des Codes zu demonstrieren. Stellen Sie sicher, dass der Text in verschiedene Sprachen übersetzt werden kann, um die Multilingualität des Codes zu testen."
