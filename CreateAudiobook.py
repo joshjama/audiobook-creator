@@ -64,7 +64,7 @@ def split_text_into_sentences(text: str, max_length: int = 250) -> list:
 
 
 
-def create_audio_tts(text_file_path, LANGUAGE='en', book_name="Example_book") : 
+def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) : 
   # Create audiobook directory 
   create_directory_from_book_name(book_name)
     # Get the device to use for TTS (use CUDA if available)
@@ -74,9 +74,13 @@ def create_audio_tts(text_file_path, LANGUAGE='en', book_name="Example_book") :
 
   # Text, der in Sprache umgewandelt werden soll
   text = read_text_from_file(text_file_path)
-  LANGUAGE = detect(text)
-  #text_chunks = split_string_into_chunks(text, 1500)
-  text_chunks = split_text_into_sentences(text) 
+  if LANGUAGE == "en" or LANGUAGE == "de" : 
+    LANGUAGE = detect(text)
+    print("Detected language : ", LANGUAGE )
+    text_chunks = split_text_into_sentences(text) 
+  else : 
+    print("Attension ! unsupported Language ! The text you insurted is not in one of the supported languages and will therefore not be splitted to sentences correctly. ")
+    text_chunks = split_string_into_chunks(text, 1500)
   for index, chunk in enumerate(text_chunks) :
 
     # Umwandlung des Textes in Sprache und Speicherung in einer Datei
@@ -163,9 +167,11 @@ def create_directory_from_book_name(book_name="Example_book") :
     if not os.path.exists(directory_path) :
         # Erstelle das Verzeichnis
         os.makedirs(directory_path)
-        print(f"Verzeichnis '{directory_path}' wurde erfolgreich erstellt.")
+        #print(f"Verzeichnis '{directory_path}' wurde erfolgreich erstellt.")
+        print(f"Directory '{directory_path}' was created successfully. ")
     else:
-        print(f"Das Verzeichnis '{directory_path}' existiert bereits.")
+        #print(f"Das Verzeichnis '{directory_path}' existiert bereits.")
+        print(f"Directory '{directory_path}' dos already exist. ")
 
 # Beispielverwendung
 #book_name = "Mein tolles Buch"
@@ -176,4 +182,8 @@ def create_directory_from_book_name(book_name="Example_book") :
 
 
 if __name__ == "__main__": 
-  create_audio_tts(sys.argv[1], TEXT_LANGUAGE, sys.argv[2]) 
+  if sys.argv[ len(sys.argv) - 1 ] != sys.argv[1] : 
+    book_name = sys.argv[2] 
+  else:  
+    book_name = "Audiobook" 
+  create_audio_tts(sys.argv[1], TEXT_LANGUAGE, book_name) 
