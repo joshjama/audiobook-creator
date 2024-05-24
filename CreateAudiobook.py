@@ -16,7 +16,7 @@ from spacy.language import Language
 # Language of the given Textfile : 
 TEXT_LANGUAGE = "en" 
 # States if the texts language was given by a cli argument. 
-text_language_set_externaly = False 
+#text_language_set_externaly = False 
 
 def load_model(language_code: str) -> Language:
   """Lädt das spaCy-Modell basierend auf dem Sprachcode."""
@@ -108,8 +108,7 @@ def read_text_from_file(file_path) :
     with open(file_path, 'r', encoding='utf-8') as file:
       text = file.read()
       language_code = detect(text)
-      if text_language_set_externaly == False : 
-        TEXT_LANGUAGE = language_code
+      TEXT_LANGUAGE = language_code
       
       return text
   except FileNotFoundError:
@@ -192,7 +191,4 @@ if __name__ == "__main__":
     book_name = sys.argv[2] 
   else:  
     book_name = "Audiobook" 
-  if sys.argv[len(sys.argv) - 2 ] == "--language" : 
-    TEXT_LANGUAGE = sys.argv[ len(sys.argv) - 1 ] 
-    text_language_set_externaly = True 
   create_audio_tts(sys.argv[1], TEXT_LANGUAGE, book_name) 
