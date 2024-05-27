@@ -76,22 +76,22 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
 
   # Text, der in Sprache umgewandelt werden soll
   text = read_text_from_file(text_file_path)
-  language_support = True 
+  language_detection_supported_for_textlanguage = True 
   if LANGUAGE == "en" or LANGUAGE == "de" : 
     #LANGUAGE = detect(text)
     LANGUAGE = TEXT_LANGUAGE 
     print("The Detected Main-language of your text is : ", LANGUAGE )
     text_chunks = split_text_into_sentences(text) 
-    language_support = True  
+    language_detection_supported_for_textlanguage = True  
   else : 
     LANGUAGE = TEXT_LANGUAGE 
     print("Attension ! unsupported Language ! The text you insurted is not in one of the supported languages and will therefore not be splitted to sentences correctly. ")
     text_chunks = split_string_into_chunks(text, 1500)
-    language_support = False 
+    language_detection_supported_for_textlanguage = False 
   for index, chunk in enumerate(text_chunks) :
 
     chunk_language = detect(chunk) 
-    if chunk_language != TEXT_LANGUAGE and language_support == True :  
+    if chunk_language != TEXT_LANGUAGE and language_detection_supported_for_textlanguage == True :  
       print("Detected a different language in the current chunk. ") 
       print("Detected Chunk-Language : " + chunk_language ) 
       LANGUAGE = chunk_language 
@@ -102,20 +102,34 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         text_to_speak = chunk_chunk 
         # Ersetzen Sie 'de_speaker_idx' durch den korrekten Index für einen deutschen Sprecher
         # und 'de_language_idx' durch den korrekten Index für die deutsche Sprache
-        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+        try: 
+          print("The current output_path is : " + output_path )
+          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+        except AssertionError: 
+          print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " in stead." ) 
+          print("The current output_path is : " + output_path )
+          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
+        
         index += 1 
 
 
 
     else: 
-      if language_support == True : 
+      if language_detection_supported_for_textlanguage == True : 
         LANGUAGE = chunk_language 
       # Umwandlung des Textes in Sprache und Speicherung in einer Datei
       output_path = book_name + "/" + book_name + f"_{index}.wav"
       text_to_speak = chunk 
       # Ersetzen Sie 'de_speaker_idx' durch den korrekten Index für einen deutschen Sprecher
       # und 'de_language_idx' durch den korrekten Index für die deutsche Sprache
-      tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+      try: 
+        print("The current output_path is : " + output_path )
+        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+      except AssertionError: 
+        print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " in stead." ) 
+        print("The current output_path is : " + output_path )
+        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
+
 
     # Abspielen der erzeugten Sprachdatei
     #audio = AudioSegment.from_wav("output.wav")
