@@ -5,6 +5,7 @@ import pydub
 from pydub import AudioSegment
 from pydub.playback import play
 import torch
+from RenameAudios import * 
 ## Splitting Text to Sentences with spacy : 
 import spacy
 from langdetect import detect
@@ -229,3 +230,5 @@ if __name__ == "__main__":
   else:  
     book_name = "Audiobook" 
   create_audio_tts(sys.argv[1], TEXT_LANGUAGE, book_name) 
+  audios_path = book_name + "/" 
+  rename_audio_files(audios_path) 
