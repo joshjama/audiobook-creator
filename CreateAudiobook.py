@@ -29,7 +29,7 @@ def load_model(language_code: str) -> Language:
   else:
     raise ValueError(f"Kein Modell für die Sprache {language_code} verfügbar.")
 
-def split_text_into_sentences(text: str, max_length: int = 250) -> list:
+def split_text_into_sentences(text: str, max_length: int = 500 ) -> list:
   """Teilt den Text in Sätze, mit Berücksichtigung der maximalen Länge."""
   language_code = TEXT_LANGUAGE  
   nlp = load_model(language_code)
