@@ -16,7 +16,7 @@ install_spacy_models() {
   # Installieren von spaCy
   source ./audiobook_venv/bin/activate && \
   echo "Installing spaCy..." && \
-  pip install spacy && \
+  pip install spacy --timeout=10000000 && \
 
   # Herunterladen der spaCy-Modelle
   #echo "Lade das deutsche Modell 'de_core_news_sm' herunter..." && \
@@ -37,8 +37,8 @@ install_requirements() {
   ./check_nvidea_gpu.sh  && \
   python3.10 -m venv audiobook_venv && \
   source ./audiobook_venv/bin/activate && \
-  pip install --upgrade pip && \
-  pip install TTS pydub spacy  langdetect && \
+  pip install --upgrade pip --timeout=10000000 && \
+  pip install TTS pydub spacy  langdetect --timeout=10000000 && \
   install_spacy_models && \
   ./check_requirements_pip_installed.sh && \
   deactivate 2>&1 
