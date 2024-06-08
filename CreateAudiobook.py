@@ -1,5 +1,6 @@
 import sys 
 import os 
+import traceback
 from TTS.api import TTS
 import pydub 
 from pydub import AudioSegment
@@ -29,23 +30,57 @@ def load_model(language_code: str) -> Language:
   else:
     raise ValueError(f"Kein Modell für die Sprache {language_code} verfügbar.")
 
-def split_text_into_sentences(text: str, max_length: int = 500 ) -> list:
+
+
+
+def determine_sentences_max_length(sentences):
+  if not sentences:
+    raise ValueError("Die Liste der Sätze darf nicht leer sein.")
+    
+  longest_sentence = ""
+  max_length = 0
+
+  for sentence in sentences:
+    if not isinstance(sentence, str):
+      raise TypeError("Alle Elemente in der Liste müssen Zeichenketten sein.")
+        
+    sentence_length = len(sentence)
+    if sentence_length > max_length:
+      longest_sentence = sentence
+      max_length = sentence_length
+
+  print("The determined max Length inside the determine_max_length function is : " + str(max_length))
+  return max_length 
+
+def split_text_into_sentences(text: str, max_length_chunk: int = 1500 ) -> list:
   """Teilt den Text in Sätze, mit Berücksichtigung der maximalen Länge."""
   language_code = TEXT_LANGUAGE  
   nlp = load_model(language_code)
   nlp.max_length = len(text) + 1
   try: 
     doc = nlp(text)
+    print("Determining the chunklength to use for each TTS cycle. ")
+    sentences_list = [] 
+    sentences_list = [sent.text for sent in doc.sents]
+    max_length_sentences = determine_sentences_max_length(sentences_list) 
+    print("The longest sentence is " + str(max_length_sentences) + " long. ") 
+    max_length_chunk = max_length_sentences * 3 
+    print("The chunk_length is :" + str(max_length_chunk))
   except MemoryError:
     print("A MemoryError occurred. This usually means the system ran out of memory. Please try reducing the size of your input or closing other applications to free up memory.", file=sys.stderr )
     print("A MemoryError occurred while trying to process the text with spaCy. The text may be too long to fit into available RAM. Please try reducing the text size or increasing the available memory.", file=sys.stderr )
     sys.exit(1)  
+  except (ValueError, TypeError) as e:
+    print("Error: Valueerror. Please ensure that your text is in the plane - text format. ")
+    traceback.print_exc()
+    print(f"Exception details: {e}")
+    return []
     
   sentences = []
   current_chunk = ""
     
   for sent in doc.sents:
-    if len(current_chunk) + len(sent.text) <= max_length or len(sent.text) > max_length:
+    if len(current_chunk) + len(sent.text) <= max_length_chunk or len(sent.text) > max_length_chunk:
       current_chunk += sent.text + " "
     else:
       sentences.append(current_chunk.strip())
