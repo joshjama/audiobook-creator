@@ -41,8 +41,8 @@ install_requirements() {
   pip install TTS pydub spacy  langdetect --timeout=10000000 && \
   install_spacy_models && \
   ./check_requirements_pip_installed.sh && \
-  deactivate 2>&1 
   check_spacy_model_install 2>&1 
+  #deactivate 2>&1 
 }
 
 install_requirements 2>&1 
