@@ -36,10 +36,10 @@ install_spacy_models() {
 install_requirements() {
   ./check_nvidea_gpu.sh  && \
   python3.10 -m venv audiobook_venv && \
-  install_spacy_models && \
   source ./audiobook_venv/bin/activate && \
   pip install --upgrade pip && \
   pip install TTS pydub spacy  langdetect && \
+  install_spacy_models && \
   ./check_requirements_pip_installed.sh && \
   deactivate 2>&1 
   check_spacy_model_install 2>&1 
