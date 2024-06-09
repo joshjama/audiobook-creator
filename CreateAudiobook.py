@@ -68,8 +68,11 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 1500 ) -> list:
     print(f"The average sentence length is {avg_length_sentences} characters.")
         
     max_length_chunk = min(max_length_sentences * 2, avg_length_sentences * 3, 1500)
-    if max_length_chunk < 500: 
+    if  max_length_chunk < 500 and max_length_sentences <= 500 : 
       max_length_chunk = 500 
+    elif max_length_sentences > 500: 
+      max_length_chunk = max_length_sentences 
+
     #print("The longest sentence is " + str(max_length_sentences) + " long. ") 
     #max_length_chunk = max_length_sentences 
     #print("The chunk_length is :" + str(max_length_chunk))
