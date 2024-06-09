@@ -63,9 +63,15 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 1500 ) -> list:
     sentences_list = [] 
     sentences_list = [sent.text for sent in doc.sents]
     max_length_sentences = determine_sentences_max_length(sentences_list) 
-    print("The longest sentence is " + str(max_length_sentences) + " long. ") 
-    max_length_chunk = max_length_sentences * 3 
-    print("The chunk_length is :" + str(max_length_chunk))
+    avg_length_sentences = int(sum(len(sent) for sent in sentences_list) / len(sentences_list)) 
+    print(f"The longest sentence is {max_length_sentences} characters long.")
+    print(f"The average sentence length is {avg_length_sentences} characters.")
+        
+    max_length_chunk = min(max_length_sentences * 2, avg_length_sentences * 3, 1500)
+    #print("The longest sentence is " + str(max_length_sentences) + " long. ") 
+    #max_length_chunk = max_length_sentences 
+    #print("The chunk_length is :" + str(max_length_chunk))
+    print(f"The chunk length is: {max_length_chunk}")
   except MemoryError:
     print("A MemoryError occurred. This usually means the system ran out of memory. Please try reducing the size of your input or closing other applications to free up memory.", file=sys.stderr )
     print("A MemoryError occurred while trying to process the text with spaCy. The text may be too long to fit into available RAM. Please try reducing the text size or increasing the available memory.", file=sys.stderr )
