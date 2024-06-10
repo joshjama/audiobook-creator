@@ -1,6 +1,7 @@
 import sys 
 import os 
 import traceback
+import re
 from TTS.api import TTS
 import pydub 
 from pydub import AudioSegment
@@ -52,7 +53,7 @@ def determine_sentences_max_length(sentences):
   print("The determined max Length inside the determine_max_length function is : " + str(max_length))
   return max_length 
 
-def split_text_into_sentences(text: str, max_length_chunk: int = 1500 ) -> list:
+def split_text_into_sentences(text: str, max_length_chunk: int = 500 ) -> list:
   """Teilt den Text in Sätze, mit Berücksichtigung der maximalen Länge."""
   language_code = TEXT_LANGUAGE  
   nlp = load_model(language_code)
@@ -67,12 +68,12 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 1500 ) -> list:
     print(f"The longest sentence is {max_length_sentences} characters long.")
     print(f"The average sentence length is {avg_length_sentences} characters.")
         
-    max_length_chunk = min(max_length_sentences * 2, avg_length_sentences * 3, 1500)
+    max_length_chunk = min(max_length_sentences * 2, avg_length_sentences * 3, 700)
     if  max_length_chunk < 500 and max_length_sentences <= 500 : 
       max_length_chunk = 500 
     elif max_length_sentences > 500 and max_length_sentences < 1500 : 
       max_length_chunk = max_length_sentences 
-    elif max_length_sentences > 1500 : 
+    elif max_length_sentences > 700 : 
       max_length_chunk = avg_length_sentences 
       while max_length_chunk < 500: 
         max_length_chunk += max_length_chunk 
@@ -104,11 +105,14 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 1500 ) -> list:
   if current_chunk:
     sentences.append(current_chunk.strip())
     
-    # Cleaning sentences from unsupported characters : 
+  # Cleaning sentences from unsupported characters : 
+  print("Cleaning sentences from unusual characters. This may take some time ... ") 
   cleaned_sentences = clean_sentences(sentences) 
   sentences_with_rong_linebrakes = cleaned_sentences 
   # Clean linebrakes within sentences by saving linebrakes in the right possitions after !":" or at the end of a sentence. 
-  sentences_finished = clean_line_breaks(sentences_with_rong_linebrakes) 
+  print("Cleaning text from unwanted linebreaks. ") 
+  sentences_with_lines = clean_line_breaks(sentences_with_rong_linebrakes) 
+  sentences_finished = remove_tabs_from_sentences(sentences_with_lines)
   sentences = sentences_finished 
   return sentences
 
@@ -138,6 +142,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
     #LANGUAGE = detect(text)
     LANGUAGE = TEXT_LANGUAGE 
     print("The Detected Main-language of your text is : ", LANGUAGE )
+    print("Splitting your text into chunks, this may take some time ... ") 
     text_chunks = split_text_into_sentences(text) 
     language_detection_supported_for_textlanguage = True  
   else : 
@@ -274,9 +279,11 @@ def create_directory_from_book_name(book_name="Example_book") :
 
 
 # Clean the sentences fo your text from unusual and therefore not supported characters. 
+
 def clean_sentences(sentences):
     """
     Replaces unusual or unsupported characters in a list of sentences with more common equivalents.
+    Also removes line breaks within sentences but keeps line breaks after colons and sentence-ending punctuation.
     
     Args:
     sentences (list of str): List of sentences to be cleaned.
@@ -317,8 +324,17 @@ def clean_sentences(sentences):
     
     for sentence in sentences:
         try:
+            # Replace unusual characters
             for old_char, new_char in replacements.items():
-                sentence = sentence.replace(old_char, new_char)
+                #sentence = re.sub(re.escape(old_char), new_char, sentence)
+                sentence = re.sub(re.escape(old_char) + r'(\w+)?' + re.escape(old_char), new_char, sentence)
+            
+            # Remove line breaks within sentences
+            #sentence = re.sub(r'(?<![:.!?])\n', ' ', sentence)
+            # Ensure line breaks after colons and sentence-ending punctuation are preserved
+            #sentence = re.sub(r'([:])\n', r'\1\n', sentence)
+            #sentence = re.sub(r'([.!?])\n', r'\1\n', sentence)
+            
             cleaned_sentences.append(sentence)
         except Exception as e:
             print(f"Error processing sentence: {sentence}. Error: {e}")
@@ -326,8 +342,7 @@ def clean_sentences(sentences):
     
     return cleaned_sentences
 
-import re
-
+# Clean linebreaks within sentences. 
 def clean_line_breaks(sentences):
     """
     Removes line breaks within sentences but keeps line breaks after colons and sentence-ending punctuation.
@@ -353,6 +368,28 @@ def clean_line_breaks(sentences):
             cleaned_sentences.append(sentence)  # Ensure the original sentence is added if an error occurs
     
     return cleaned_sentences
+
+# Replace \t with " " : 
+def remove_tabs_from_sentences(sentences):
+    """
+    Entfernt alle Tabs aus den Sätzen und ersetzt sie durch Leerzeichen.
+    
+    :param sentences: Liste von Sätzen
+    :return: Liste von Sätzen ohne Tabs
+    """
+    cleaned_sentences = []
+    for sentence in sentences:
+        try:
+            cleaned_sentence = sentence.replace('\t', ' ')
+            cleaned_sentences.append(cleaned_sentence)
+        except Exception as e:
+            print(f"Error processing sentence: {sentence}")
+            print(f"Exception details: {e}")
+            traceback.print_exc()
+            # Füge den ursprünglichen Satz hinzu, wenn eine Ausnahme auftritt
+            cleaned_sentences.append(sentence)
+    return cleaned_sentences
+
 
 
 
