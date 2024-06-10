@@ -105,8 +105,11 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 1500 ) -> list:
     sentences.append(current_chunk.strip())
     
     # Cleaning sentences from unsupported characters : 
-    cleaned_sentences = clean_sentences(sentences) 
-    sentences = cleaned_sentences 
+  cleaned_sentences = clean_sentences(sentences) 
+  sentences_with_rong_linebrakes = cleaned_sentences 
+  # Clean linebrakes within sentences by saving linebrakes in the right possitions after !":" or at the end of a sentence. 
+  sentences_finished = clean_line_breaks(sentences_with_rong_linebrakes) 
+  sentences = sentences_finished 
   return sentences
 
 # Beispieltext
@@ -322,6 +325,37 @@ def clean_sentences(sentences):
             cleaned_sentences.append(sentence)  # Ensure the original sentence is added if an error occurs
     
     return cleaned_sentences
+
+import re
+
+def clean_line_breaks(sentences):
+    """
+    Removes line breaks within sentences but keeps line breaks after colons and sentence-ending punctuation.
+    
+    Args:
+    sentences (list of str): List of sentences to be cleaned.
+    
+    Returns:
+    list of str: Cleaned list of sentences.
+    """
+    cleaned_sentences = []
+    
+    for sentence in sentences:
+        try:
+            # Replace line breaks within sentences with a space
+            sentence = re.sub(r'(?<![:.!?])\n', ' ', sentence)
+            # Ensure line breaks after colons and sentence-ending punctuation are preserved
+            sentence = re.sub(r'([:])\n', r'\1\n', sentence)
+            sentence = re.sub(r'([.!?])\n', r'\1\n', sentence)
+            cleaned_sentences.append(sentence)
+        except Exception as e:
+            print(f"Error processing sentence: {sentence}. Error: {e}")
+            cleaned_sentences.append(sentence)  # Ensure the original sentence is added if an error occurs
+    
+    return cleaned_sentences
+
+
+
 
 
 
