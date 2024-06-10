@@ -112,6 +112,7 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 500 ) -> list:
   # Clean linebrakes within sentences by saving linebrakes in the right possitions after !":" or at the end of a sentence. 
   print("Cleaning text from unwanted linebreaks. ") 
   sentences_with_lines = clean_line_breaks(sentences_with_rong_linebrakes) 
+  print("Replaceing tabs \t with spaces. ")
   sentences_finished = remove_tabs_from_sentences(sentences_with_lines)
   sentences = sentences_finished 
   return sentences
