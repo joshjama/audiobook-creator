@@ -104,6 +104,9 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 1500 ) -> list:
   if current_chunk:
     sentences.append(current_chunk.strip())
     
+    # Cleaning sentences from unsupported characters : 
+    cleaned_sentences = clean_sentences(sentences) 
+    sentences = cleaned_sentences 
   return sentences
 
 # Beispieltext
@@ -266,9 +269,65 @@ def create_directory_from_book_name(book_name="Example_book") :
         #print(f"Das Verzeichnis '{directory_path}' existiert bereits.")
         print(f"Directory '{directory_path}' dos already exist. ")
 
-# Beispielverwendung
-#book_name = "Mein tolles Buch"
-#create_directory_from_book_name(book_name)
+
+# Clean the sentences fo your text from unusual and therefore not supported characters. 
+def clean_sentences(sentences):
+    """
+    Replaces unusual or unsupported characters in a list of sentences with more common equivalents.
+    
+    Args:
+    sentences (list of str): List of sentences to be cleaned.
+    
+    Returns:
+    list of str: Cleaned list of sentences.
+    """
+    replacements = {
+        '«': '"',
+        '»': '"',
+        '„': '"',
+        '“': '"',
+        '”': '"',
+        '‘': "'",
+        '’': "'",
+        '—': '-',
+        '–': '-',
+        '…': '...',
+        '•': '-',
+        '€': 'EUR',
+        '£': 'GBP',
+        '¥': 'JPY',
+        '©': '(c)',
+        '®': '(r)',
+        '™': '(tm)',
+        '°': ' degrees',
+        '±': '+/-',
+        '×': 'x',
+        '÷': '/',
+        '∞': 'infinity',
+        '≈': 'approx.',
+        '≠': '!=',
+        '≤': '<=',
+        '≥': '>='
+    }
+    
+    cleaned_sentences = []
+    
+    for sentence in sentences:
+        try:
+            for old_char, new_char in replacements.items():
+                sentence = sentence.replace(old_char, new_char)
+            cleaned_sentences.append(sentence)
+        except Exception as e:
+            print(f"Error processing sentence: {sentence}. Error: {e}")
+            cleaned_sentences.append(sentence)  # Ensure the original sentence is added if an error occurs
+    
+    return cleaned_sentences
+
+
+
+
+
+
 
 
 
