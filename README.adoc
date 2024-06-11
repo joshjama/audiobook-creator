@@ -39,3 +39,19 @@ Usage :
 * We will add more languages in later releases. 
 * We need to download a spacy model for each language in order to split the book to sentences correctly. 
 
+== Webserver : 
+=== Attension ! Do only use it inside secure local or vpn - networks ! It is not ready to be used as service online !  
+
+* The web-server can be used to work with audiobook-creation from another device like a smartphone. 
+* It should only be used within secure networks as it dows not implement any security or privacy functionality. 
+* Please note that currently the complete folder structure is shown to the user. This will e fixed in later versions. For the moment you should only use it within your vpn or local network!!! 
+
+=== Usage : 
+
+* $ source audiobook_venv/bin/activate && python ./AudiobookCreatorWebServer.py 
+* It will runn under localhost:5000 
+* You can insert your text into the textfeald or upload a .txt file. 
+* The created audiobooks will show up as folders in the directory Tree. 
+* You can play them by klicking on the dirctory and after then just on play. 
+
+
