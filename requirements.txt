@@ -2,3 +2,4 @@ pydub
 TTS
 spacy 
 langdetect 
+flask 
