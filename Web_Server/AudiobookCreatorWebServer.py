@@ -4,6 +4,7 @@ import threading
 from flask import Flask, request, render_template_string, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
 from CreateAudiobook import create_audio_tts, TEXT_LANGUAGE
+from RenameAudios import * 
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'Downloads'
@@ -155,6 +156,8 @@ def upload_file():
     print('Submit button pressed')
     text = request.form.get('text')
     audiobook_name = request.form.get('audiobook_name')
+    audiobook_name = audiobook_name.replace(" ", "") 
+    audiobook_name = audiobook_name.replace(".", "") 
     if not audiobook_name:
         audiobook_name = 'Audiobook_' + str(len(os.listdir(AUDIOBOOKS_FOLDER)) + 1)
     audiobook_folder = os.path.join(AUDIOBOOKS_FOLDER, audiobook_name)
@@ -201,6 +204,10 @@ def create_audio_tts_with_logging(file_path, text_language, audiobook_folder):
     try:
         print(f'Starting audiobook creation for {file_path}')
         create_audio_tts(file_path, text_language, audiobook_folder)
+        book_name = audiobook_folder.replace("/", "")  
+        book_name = book_name.replace(".", "") 
+        audios_path = book_name + "/" 
+        rename_audio_files(audios_path) 
         print(f'Audiobook creation completed for {file_path}')
     except Exception as e:
         print(f'Error during audiobook creation: {str(e)}')
@@ -223,5 +230,5 @@ def download_file(folder, filename):
         return f'Error downloading file: {str(e)}', 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
