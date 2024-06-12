@@ -48,10 +48,9 @@ Usage :
 
 === Usage : 
 
-* $ source audiobook_venv/bin/activate && python ./AudiobookCreatorWebServer.py 
+* $ source audiobook_venv/bin/activate && cd Web_Server && python ./AudiobookCreatorWebServer.py 
 * It will runn under localhost:5000 
 * You can insert your text into the textfeald or upload a .txt file. 
 * The created audiobooks will show up as folders in the directory Tree. 
 * You can play them by klicking on the dirctory and after then just on play. 
-
 
