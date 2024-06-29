@@ -1,0 +1,32 @@
+= Todo : Bugfixes and Feature-requests : 
+@Author : Joshua Jama 
+@Date : 29.6.2024 
+@Category : Todo, bugg-fixes, feature-requests 
+
+
+
+== XTTS can only process texts to a size of 400 tokens problem : 
+
+* When text-file greater then 10000 chars : the followin error is shown : xtts can only process 400 token 
+* That may also be caused by copyright caractors or to long sentences. 
+
+
+== Bugg-Fixes: 
+
+* Chunklänge für sehr lange auflistung überprüfen wird anscheinend manchmal zu lang gelassen 
+* Die license von cockwi tts akzeptieren im browser möglich machen durch den pflask server 
+* Pyenv  für die installation der version 3.10 benutzen bevor der installer ausgeführt wird 
+* Normalisierung der wav 
+* Regex for copyright 
+
+== Feature-Requests : 
+
+
+* Text  im player anzeigen  dafür chunks  auf speichern 
+* Log in browser 
+* Exception für maximum token anzahl für text und spacy oder xtts ueberschritten. 
+* Falsche Datein im Browser verstecken 
+* Auswahlfeld fuer die Stimme 
+* Alle von xtts unterstützten Sprachen bei den spacy model download im installer einfügen. 
+* Translation
+
