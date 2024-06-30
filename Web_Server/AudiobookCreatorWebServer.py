@@ -1,6 +1,7 @@
 import os
 import sys
 import threading
+import traceback
 from flask import Flask, request, render_template_string, send_from_directory, redirect, url_for
 from werkzeug.utils import secure_filename
 from CreateAudiobook import create_audio_tts, TEXT_LANGUAGE
@@ -211,6 +212,7 @@ def create_audio_tts_with_logging(file_path, text_language, audiobook_folder):
         print(f'Audiobook creation completed for {file_path}')
     except Exception as e:
         print(f'Error during audiobook creation: {str(e)}')
+        traceback.print_exc()
     finally:
         try:
             os.remove(file_path)

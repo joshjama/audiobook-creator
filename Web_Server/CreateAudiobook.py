@@ -171,9 +171,12 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         except AssertionError: 
           print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " in stead." ) 
           print("The current output_path is : " + output_path )
-          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
+          print("An unexpected error was detected. The 400 token problem may have been the cause. ")
+          #tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
+          continue 
         except Exception as e:
           print("An unexpected error was detected. The 400 token problem may have been the cause. ")
+          continue 
           
         
         index += 1 
@@ -193,10 +196,13 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
       except AssertionError: 
         print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " in stead." ) 
+        print("An unexpected error was detected. The 400 token problem may have been the cause. ")
         print("The current output_path is : " + output_path )
-        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
+        continue 
+        #tts#.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
       except Exception as e:
         print("An unexpected error was detected. The 400 token problem may have been the cause. ")
+        continue 
 
 
     # Abspielen der erzeugten Sprachdatei
