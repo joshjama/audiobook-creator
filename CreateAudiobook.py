@@ -176,8 +176,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           #tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
           smaller_chunks = split_string_into_chunks(text_to_speak, 100) 
           print("This chunk is to long for xtts. Splitting into smaller chunks with split_string_into_chunks. !Attension this may cause iregular sentence splitting and may leed to blurring sounds. ")
+          smaller_chunk_index = index 
           for small_chunk in smaller_chunks : 
-            smaller_chunk_index = chunk_index 
             output_path = book_name + "/" + book_name + f"_{smaller_chunk_index}.wav"
             print("The current output-path is : " + output_path )
             tex_to_speak = small_chunk 
@@ -185,13 +185,16 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
               tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
             except Exception as e:
               print("skipping") 
+              smaller_chunk_index += 1 
               continue 
             smaller_chunk_index += 1 
           chunk_index = smaller_chunk_index 
+          index += 1 
           continue 
         except Exception as e:
           print("An unexpected error was detected. The 400 token problem may have been the cause. ")
           traceback.print_exc()
+          index += 1 
           continue 
           
         
@@ -217,8 +220,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         traceback.print_exc()
         print("This chunk is to long for xtts. Splitting into smaller chunks with split_string_into_chunks. !Attension this may cause iregular sentence splitting and may leed to blurring sounds. ")
         smaller_chunks = split_string_into_chunks(text_to_speak, 100) 
+        smaller_chunk_index = index 
         for small_chunk in smaller_chunks : 
-          smaller_chunk_index = index 
           output_path = book_name + "/" + book_name + f"_{smaller_chunk_index}.wav"
           print("The current output-path is : " + output_path )
           tex_to_speak = small_chunk 
@@ -226,6 +229,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
             tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
           except Exception as e:
             print("skipping") 
+            smaller_chunk_index += 1 
             continue 
           smaller_chunk_index += 1 
         index = smaller_chunk_index 
@@ -234,6 +238,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
       except Exception as e:
         print("An unexpected error was detected. The 400 token problem may have been the cause. ")
         traceback.print_exc()
+        index += 1 
         continue 
 
 
