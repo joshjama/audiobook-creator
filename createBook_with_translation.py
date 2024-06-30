@@ -1,17 +1,20 @@
-import sys 
-import os 
+import sys
+import os
 import traceback
 import re
+import argparse
 from TTS.api import TTS
-import pydub 
+import pydub
 from pydub import AudioSegment
 from pydub.playback import play
 import torch
-from RenameAudios import * 
-## Splitting Text to Sentences with spacy : 
+from RenameAudios import *
 import spacy
 from langdetect import detect
 from spacy.language import Language
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import ollama
+from ollama import Client
 
 ## Usage : 
 #$ python ./CreateAudiobook.py /PATH_TO_TEXT your_books_name  
@@ -21,37 +24,38 @@ TEXT_LANGUAGE = "en"
 # States if the texts language was given by a cli argument. 
 #text_language_set_externaly = False 
 
+OLLAMA_URL = 'http://192.168.178.96:11434'
+
 def load_model(language_code: str) -> Language:
-  """Lädt das spaCy-Modell basierend auf dem Sprachcode."""
-  if language_code == "de":
-    return spacy.load("de_core_news_sm")
-  elif language_code == "en":
-    return spacy.load("en_core_web_sm")
-  # Fügen Sie hier weitere Sprachen und Modelle hinzu
-  else:
-    raise ValueError(f"Kein Modell für die Sprache {language_code} verfügbar.")
-
-
-
+    """Lädt das spaCy-Modell basierend auf dem Sprachcode."""
+    if language_code == "de":
+        return spacy.load("de_core_news_sm")
+    elif language_code == "en":
+        return spacy.load("en_core_web_sm")
+    elif language_code == "fr":
+        return spacy.load("fr_core_web_sm")
+     # Fügen Sie hier weitere Sprachen und Modelle hinzu
+    else:
+        raise ValueError(f"Kein Modell für die Sprache {language_code} verfügbar.")
 
 def determine_sentences_max_length(sentences):
-  if not sentences:
-    raise ValueError("Die Liste der Sätze darf nicht leer sein.")
-    
-  longest_sentence = ""
-  max_length = 0
-
-  for sentence in sentences:
-    if not isinstance(sentence, str):
-      raise TypeError("Alle Elemente in der Liste müssen Zeichenketten sein.")
+    if not sentences:
+        raise ValueError("Die Liste der Sätze darf nicht leer sein.")
         
-    sentence_length = len(sentence)
-    if sentence_length > max_length:
-      longest_sentence = sentence
-      max_length = sentence_length
+    longest_sentence = ""
+    max_length = 0
 
-  print("The determined max Length inside the determine_max_length function is : " + str(max_length))
-  return max_length 
+    for sentence in sentences:
+        if not isinstance(sentence, str):
+            raise TypeError("Alle Elemente in der Liste müssen Zeichenketten sein.")
+            
+        sentence_length = len(sentence)
+        if sentence_length > max_length:
+            longest_sentence = sentence
+            max_length = sentence_length
+
+    print("The determined max Length inside the determine_max_length function is : " + str(max_length))
+    return max_length 
 
 def split_text_into_sentences(text: str, max_length_chunk: int = 500 ) -> list:
   """Teilt den Text in Sätze, mit Berücksichtigung der maximalen Länge."""
@@ -125,95 +129,136 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 500 ) -> list:
 
 #print(sentences)
 
+def translate_text(text: str, target_language: str) -> str:
+    """Translates text to the target language using a local Ollama instance."""
+    client = Client(host=OLLAMA_URL)
+    modelquery = f"Bitte übersetze den folgenden Text genau, ohne irgendwelche Änderungen oder das Hinzufügen von Wörtern, nach {target_language}:\n {text}\n Achte darauf, dass die Bedeutung und der Inhalt des Originaltextes vollständig und präzise erhalten bleiben. Verwende keine zusätzlichen Erklärungen, und vermeide jegliche Anpassungen, die nicht zwingend erforderlich sind, um den Text korrekt nach {target_language} zu übertragen."
+    
+    try:
+        print(text)
+        translation = ollama.generate(model="llama3", prompt=modelquery, stream=False)
+        print ('##TRANSLATION: '+ translation['response'])
+        return translation['response'] 
+    except Exception as e:
+        print(f"Translation error: {e}")
+        return text
 
-
-
-def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) : 
-  # Create audiobook directory 
-  create_directory_from_book_name(book_name)
-    # Get the device to use for TTS (use CUDA if available)
-  device = "cuda" if torch.cuda.is_available() else "cpu"
-  # Initialisierung des XTTS-Modells
-  tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2").to(device)
-
-  # Text, der in Sprache umgewandelt werden soll
-  text = read_text_from_file(text_file_path)
-  language_detection_supported_for_textlanguage = True 
-  if LANGUAGE == "en" or LANGUAGE == "de" : 
-    #LANGUAGE = detect(text)
-    LANGUAGE = TEXT_LANGUAGE 
-    print("The Detected Main-language of your text is : ", LANGUAGE )
-    print("Splitting your text into chunks, this may take some time ... ") 
-    text_chunks = split_text_into_sentences(text) 
-    language_detection_supported_for_textlanguage = True  
-  else : 
-    LANGUAGE = TEXT_LANGUAGE 
-    print("Attension ! unsupported Language ! The text you insurted is not in one of the supported languages and will therefore not be splitted to sentences correctly. ")
-    text_chunks = split_string_into_chunks(text, 1500)
-    language_detection_supported_for_textlanguage = False 
-  for index, chunk in enumerate(text_chunks) :
-
-    chunk_language = detect(chunk) 
-    if chunk_language != TEXT_LANGUAGE and language_detection_supported_for_textlanguage == True :  
-      print("Detected a different language in the current chunk. ") 
-      print("Detected Chunk-Language : " + chunk_language ) 
-      LANGUAGE = chunk_language 
-      chunk_chunks = split_text_into_sentences(chunk) 
-      for chunk_index, chunk_chunk in enumerate(chunk_chunks) :
-        # Umwandlung des Textes in Sprache und Speicherung in einer Datei
-        output_path = book_name + "/" + book_name + f"_{index}.wav"
-        text_to_speak = chunk_chunk 
-        # Ersetzen Sie 'de_speaker_idx' durch den korrekten Index für einen deutschen Sprecher
-        # und 'de_language_idx' durch den korrekten Index für die deutsche Sprache
-        try: 
-          print("The current output_path is : " + output_path )
-          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
-        except AssertionError: 
-          print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " instead." ) 
-          print("The current output_path is : " + output_path )
-          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
-        
-        index += 1 
-
-
-
-    else: 
-      if language_detection_supported_for_textlanguage == True : 
-        LANGUAGE = chunk_language 
-      # Umwandlung des Textes in Sprache und Speicherung in einer Datei
-      output_path = book_name + "/" + book_name + f"_{index}.wav"
-      text_to_speak = chunk 
-      # Ersetzen Sie 'de_speaker_idx' durch den korrekten Index für einen deutschen Sprecher
-      # und 'de_language_idx' durch den korrekten Index für die deutsche Sprache
-      try: 
-        print("The current output_path is : " + output_path )
-        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
-      except AssertionError: 
-        print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " in stead." ) 
-        print("The current output_path is : " + output_path )
+def generate_tts(tts, text_to_speak, output_path, language):
+    try:
+        print("The current output_path is : " + output_path)
+        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=language)
+    except AssertionError:
+        print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " instead.")
+        print("The current output_path is : " + output_path)
         tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
 
+def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", concatenate=False, translate=False, target_language="en", num_workers=4):
+    # Create audiobook directory
+    create_directory_from_book_name(book_name)
+    # Get the device to use for TTS (use CUDA if available)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # Initialisierung des XTTS-Modells
+    tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2").to(device)
 
-    # Abspielen der erzeugten Sprachdatei
-    #audio = AudioSegment.from_wav("output.wav")
+    # Text, der in Sprache umgewandelt werden soll
+    text = read_text_from_file(text_file_path)
+    if text is None:
+        print("Failed to read the text file. Exiting.")
+        return
 
-    # Abspielen der Audiodatei
-    #play(audio)
-  print("Audiobook generation finished") 
+    language_detection_supported_for_textlanguage = True 
+    if LANGUAGE == "en" or LANGUAGE == "de" : 
+        LANGUAGE = TEXT_LANGUAGE 
+        print("The Detected Main-language of your text is : ", LANGUAGE )
+        print("Splitting your text into chunks, this may take some time ... ") 
+        text_chunks = split_text_into_sentences(text) 
+        language_detection_supported_for_textlanguage = True  
+    else : 
+        LANGUAGE = TEXT_LANGUAGE 
+        print("Attention ! unsupported Language ! The text you inserted is not in one of the supported languages and will therefore not be splitted to sentences correctly. ")
+        text_chunks = split_string_into_chunks(text, 1500)
+        language_detection_supported_for_textlanguage = False
+
+    tasks = []
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        for index, chunk in enumerate(text_chunks):
+            if translate:
+                chunk = translate_text(chunk, target_language)
+                LANGUAGE = target_language
+
+            chunk_language = detect(chunk)
+            if chunk_language != TEXT_LANGUAGE and language_detection_supported_for_textlanguage == True :
+                print("Detected a different language in the current chunk.")
+                print("Detected Chunk-Language : " + chunk_language)
+                LANGUAGE = chunk_language
+                chunk_chunks = split_text_into_sentences(chunk)
+                for chunk_index, chunk_chunk in enumerate(chunk_chunks):
+                    output_path = book_name + "/" + book_name + f"_{index}_{chunk_index}.wav"
+                    tasks.append(executor.submit(generate_tts, tts, chunk_chunk, output_path, LANGUAGE))
+                    text_to_speak = chunk_chunk 
+                try: 
+                    print("The current output_path is : " + output_path )
+                    tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                except AssertionError: 
+                    print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " in stead." ) 
+                    print("The current output_path is : " + output_path )
+                    tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
+                    index += 1
+            else:
+                if language_detection_supported_for_textlanguage == True :
+                    LANGUAGE = chunk_language
+                output_path = book_name + "/" + book_name + f"_{index}.wav"
+                tasks.append(executor.submit(generate_tts, tts, chunk, output_path, LANGUAGE))
+                
+
+        for task in as_completed(tasks):
+            task.result()  # To catch any exceptions that might have occurred
+
+    if concatenate:
+        concatenate_audio_files(book_name)
+    print("Audiobook generation finished") 
 
 
-def read_text_from_file(file_path) : 
-  global TEXT_LANGUAGE, text_language_set_externaly 
-  try:
-    with open(file_path, 'r', encoding='utf-8') as file:
-      text = file.read()
-      language_code = detect(text)
-      TEXT_LANGUAGE = language_code
-      
-      return text
-  except FileNotFoundError:
-    print("The file was not found.")
-    return None
+def concatenate_audio_files(book_name):
+    from pydub import AudioSegment
+
+    # Get the directory where the audio files are stored
+    directory_path = os.path.join(os.getcwd(), book_name)
+
+    # List all audio files in the directory
+    audio_files = [f for f in os.listdir(directory_path) if f.endswith('.wav')]
+    audio_files.sort()  # Ensure files are in the correct order
+
+    # Initialize an empty AudioSegment
+    combined = AudioSegment.empty()
+
+    # Loop through each audio file and append it to the combined AudioSegment
+    for audio_file in audio_files:
+        file_path = os.path.join(directory_path, audio_file)
+        audio_segment = AudioSegment.from_wav(file_path)
+        combined += audio_segment
+
+    # Export the combined audio file
+    output_file_path = os.path.join(directory_path, f"{book_name}_combined.wav")
+    combined.export(output_file_path, format="wav")
+    print(f"Combined audio file created at: {output_file_path}")
+
+
+def read_text_from_file(file_path):
+    global TEXT_LANGUAGE, text_language_set_externaly 
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            text = file.read()
+            language_code = detect(text)
+            TEXT_LANGUAGE = language_code
+            return text
+    except FileNotFoundError:
+        print("The file was not found.")
+        return None
+    except Exception as e:
+        print(f"An error occurred while reading the file: {e}")
+        return None
+
 
 # Split the input text to chunks of 200 characters. 
 def split_string_into_chunks(input_string, chunk_size) :
@@ -391,11 +436,21 @@ def remove_tabs_from_sentences(sentences):
             cleaned_sentences.append(sentence)
     return cleaned_sentences
 
-if __name__ == "__main__": 
-  if sys.argv[ len(sys.argv) - 1 ] != sys.argv[1] : 
-    book_name = sys.argv[2] 
-  else:  
-    book_name = "Audiobook" 
-  create_audio_tts(sys.argv[1], TEXT_LANGUAGE, book_name) 
-  audios_path = book_name + "/" 
-  rename_audio_files(audios_path) 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate audiobook from text file.")
+    parser.add_argument("text_file_path", type=str, help="Path to the input text file.")
+    parser.add_argument("book_name", type=str, help="Name of the audiobook.")
+    parser.add_argument("--concatenate", action="store_true", help="Concatenate the generated audio files into one.")
+    parser.add_argument("--translate", type=str, help="Translate the text to the specified language before TTS conversion.")
+    parser.add_argument("--num_workers", type=int, default=4, help="Number of parallel executions for the TTS function.")
+    
+    args = parser.parse_args()
+    
+    concatenate = args.concatenate
+    translate = args.translate is not None
+    target_language = args.translate if translate else "en"
+    num_workers = args.num_workers
+    
+    create_audio_tts(args.text_file_path, TEXT_LANGUAGE, args.book_name, concatenate, translate, target_language, num_workers)
+    audios_path = args.book_name + "/"
+    rename_audio_files(audios_path)
