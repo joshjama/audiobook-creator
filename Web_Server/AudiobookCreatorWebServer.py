@@ -25,7 +25,7 @@ def index():
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Text to Audiobook</title>
+        <title>Audiobook-Creator</title>
         <script>
             function showLoading() {
                 document.getElementById('loading').style.display = 'block';

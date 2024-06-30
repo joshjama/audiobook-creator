@@ -149,7 +149,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
   else : 
     LANGUAGE = TEXT_LANGUAGE 
     print("Attension ! unsupported Language ! The text you insurted is not in one of the supported languages and will therefore not be splitted to sentences correctly. ")
-    text_chunks = split_string_into_chunks(text, 1500)
+    text_chunks = split_string_into_chunks(text, 200)
     language_detection_supported_for_textlanguage = False 
   for index, chunk in enumerate(text_chunks) :
 
@@ -172,10 +172,26 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " in stead." ) 
           print("The current output_path is : " + output_path )
           print("An unexpected error was detected. The 400 token problem may have been the cause. ")
+          traceback.print_exc()
           #tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
+          smaller_chunks = split_string_into_chunks(text_to_speak, 100) 
+          print("This chunk is to long for xtts. Splitting into smaller chunks with split_string_into_chunks. !Attension this may cause iregular sentence splitting and may leed to blurring sounds. ")
+          for small_chunk in smaller_chunks : 
+            smaller_chunk_index = chunk_index 
+            output_path = book_name + "/" + book_name + f"_{smaller_chunk_index}.wav"
+            print("The current output-path is : " + output_path )
+            tex_to_speak = small_chunk 
+            try: 
+              tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+            except Exception as e:
+              print("skipping") 
+              continue 
+            smaller_chunk_index += 1 
+          chunk_index = smaller_chunk_index 
           continue 
         except Exception as e:
           print("An unexpected error was detected. The 400 token problem may have been the cause. ")
+          traceback.print_exc()
           continue 
           
         
@@ -198,10 +214,26 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " in stead." ) 
         print("An unexpected error was detected. The 400 token problem may have been the cause. ")
         print("The current output_path is : " + output_path )
+        traceback.print_exc()
+        print("This chunk is to long for xtts. Splitting into smaller chunks with split_string_into_chunks. !Attension this may cause iregular sentence splitting and may leed to blurring sounds. ")
+        smaller_chunks = split_string_into_chunks(text_to_speak, 100) 
+        for small_chunk in smaller_chunks : 
+          smaller_chunk_index = index 
+          output_path = book_name + "/" + book_name + f"_{smaller_chunk_index}.wav"
+          print("The current output-path is : " + output_path )
+          tex_to_speak = small_chunk 
+          try: 
+            tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+          except Exception as e:
+            print("skipping") 
+            continue 
+          smaller_chunk_index += 1 
+        index = smaller_chunk_index 
         continue 
         #tts#.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
       except Exception as e:
         print("An unexpected error was detected. The 400 token problem may have been the cause. ")
+        traceback.print_exc()
         continue 
 
 
@@ -226,7 +258,7 @@ def read_text_from_file(file_path) :
     print("The file was not found.")
     return None
 
-# Split the input text to chunks of 200 characters. 
+# Split the input text to chunks of 100 characters. 
 def split_string_into_chunks(input_string, chunk_size) :
   # Initialisiere die Liste für die Chunks
   chunks = []
