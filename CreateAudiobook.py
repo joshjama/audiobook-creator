@@ -50,13 +50,14 @@ def split_long_sentence(sentence, max_length):
     current_chunk = []
     
     for word in words:
-        current_chunk.append(word)
-        if len(current_chunk) >= max_length:
-            chunks.append(" ".join(current_chunk))
-            current_chunk = []
+        if len(' '.join(current_chunk + [word])) > max_length:
+            chunks.append(' '.join(current_chunk))
+            current_chunk = [word]
+        else:
+            current_chunk.append(word)
     
     if current_chunk:
-        chunks.append(" ".join(current_chunk))
+        chunks.append(' '.join(current_chunk))
     
     return chunks
 
@@ -144,29 +145,37 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", concatenat
         chunk_language = detect(chunk)
         if chunk_language not in ["en", "de"]:
             chunk_language = TEXT_LANGUAGE
-        if len(chunk.split()) > max_chunk_length:
-            chunk_sentences = split_long_sentence(chunk, max_chunk_length)
-        else:
-            chunk_sentences = [chunk]
 
-        for sentence in chunk_sentences:
-            if len(sentence.split()) > max_chunk_length:
-                print(f"Warning: Sentence length ({len(sentence.split())}) exceeds max_chunk_length ({max_chunk_length}). Splitting sentence.")
-                split_sentences = split_long_sentence(sentence, max_chunk_length)
+        sentences = []
+        current_chunk = ""
+        for sentence in chunk.split('. '):
+            if len(current_chunk) + len(sentence) <= max_chunk_length:
+                current_chunk += sentence + ". "
             else:
-                split_sentences = [sentence]
-            
-            for split_sentence in split_sentences:
-                print(f"Sentence length: {len(split_sentence.split())} / max_chunk_length: {max_chunk_length}")
+                if current_chunk:
+                    sentences.append(current_chunk.strip())
+                current_chunk = sentence + ". "
+        if current_chunk:
+            sentences.append(current_chunk.strip())
+
+        # Ensure chunks are within max length
+        final_sentences = []
+        for sentence in sentences:
+            if len(sentence) > max_chunk_length:
+                final_sentences.extend(split_long_sentence(sentence, max_chunk_length))
+            else:
+                final_sentences.append(sentence)
+
+        for sentence in final_sentences:
+            if sentence.strip():  # Ensure the chunk is not empty
+                print(f"Sentence length: {len(sentence)} / max_chunk_length: {max_chunk_length}")
                 output_path = os.path.join(book_name, f"{book_name}_{index}.wav")
                 try:
                     print("The current output_path is : " + output_path)
-                    print(len(split_sentence))
-                    tts.tts_to_file(text=split_sentence, file_path=output_path, speaker='Claribel Dervla', language=chunk_language)
+                    tts.tts_to_file(text=sentence, file_path=output_path, speaker='Claribel Dervla', language=chunk_language)
                 except AssertionError:
                     print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " instead.")
-                    print(len(split_sentence))
-                    tts.tts_to_file(text=split_sentence, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
+                    tts.tts_to_file(text=sentence, file_path=output_path, speaker='Claribel Dervla', language=TEXT_LANGUAGE)
                 index += 1
 
     if concatenate:
