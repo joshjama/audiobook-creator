@@ -143,7 +143,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           print("The current output_path is : " + output_path )
           tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
           with open(log_file_path, 'a', encoding='utf-8') as log_file:
-            log_file.write(f"AE1: {output_path}\n")
+            log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
+            #log_file.write(f"AE1: {output_path}\n")
           index += 1
         except AssertionError: 
           print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " instead." ) 
@@ -159,7 +160,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
             try: #AE2
               tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
               with open(log_file_path, 'a', encoding='utf-8') as log_file:
-                log_file.write(f"AE2: {output_path}\n")
+                log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
+                #log_file.write(f"AE2: {output_path}\n")
               index += 1
             except Exception as e:
               print("skipping") 
@@ -168,7 +170,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
                 try: #AE2
                   tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
-                    log_file.write(f"AE2: {output_path}\n")
+                    log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
+                    #log_file.write(f"AE2: {output_path}\n")
                   index += 1
                 except Exception as e:
                   print("Skipping") 
@@ -178,7 +181,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
                 try: #AE2
                   tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
-                    log_file.write(f"AE2: {output_path}\n")
+                    log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
+                    #log_file.write(f"AE2: {output_path}\n")
                   index += 1
                 except Exception as e:
                   print("Skipping") 
@@ -199,7 +203,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         print("The current output_path is : " + output_path )
         tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
         with open(log_file_path, 'a', encoding='utf-8') as log_file:
-          log_file.write(f"BE1: {output_path}\n")
+          log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
+          #log_file.write(f"BE1: {output_path}\n")
         index += 1
       except AssertionError: 
         print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " instead." ) 
@@ -216,7 +221,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           try: #BE2
             tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
             with open(log_file_path, 'a', encoding='utf-8') as log_file:
-              log_file.write(f"BE2: {output_path}\n")
+              log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
+              #log_file.write(f"BE2: {output_path}\n")
             index += 1
           except Exception as e:
             print("skipping") 
@@ -225,7 +231,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
               try: #AE2
                 tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
-                  log_file.write(f"AE2: {output_path}\n")
+                  log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
+                  #log_file.write(f"AE2: {output_path}\n")
                 index += 1
               except Exception as e:
                 print("Skipping") 
@@ -235,7 +242,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
               try: #AE2
                 tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
-                  log_file.write(f"AE2: {output_path}\n")
+                  log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
+                  #log_file.write(f"AE2: {output_path}\n")
                 index += 1
               except Exception as e:
                 print("Skipping") 
