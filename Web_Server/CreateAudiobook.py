@@ -163,6 +163,26 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
               index += 1
             except Exception as e:
               print("skipping") 
+              if LANGUAGE == "en" : 
+                text_to_speak = "Sorry, this sentences seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
+                try: #AE2
+                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                  with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                    log_file.write(f"AE2: {output_path}\n")
+                  index += 1
+                except Exception as e:
+                  print("Skipping") 
+                  continue 
+              elif LANGUAGE == "de" : 
+                text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
+                try: #AE2
+                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                  with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                    log_file.write(f"AE2: {output_path}\n")
+                  index += 1
+                except Exception as e:
+                  print("Skipping") 
+                  continue 
               continue 
           chunk_index = smaller_chunk_index 
           continue 
@@ -200,6 +220,26 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
             index += 1
           except Exception as e:
             print("skipping") 
+            if LANGUAGE == "en" : 
+              text_to_speak = "Sorry, this sentences seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
+              try: #AE2
+                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                  log_file.write(f"AE2: {output_path}\n")
+                index += 1
+              except Exception as e:
+                print("Skipping") 
+                continue 
+            elif LANGUAGE == "de" : 
+              text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
+              try: #AE2
+                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                  log_file.write(f"AE2: {output_path}\n")
+                index += 1
+              except Exception as e:
+                print("Skipping") 
+                continue 
             continue 
         continue 
       except Exception as e:
