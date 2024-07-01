@@ -149,7 +149,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " instead." ) 
           print("An unexpected error was detected. The 400 token problem may have been the cause. ")
           traceback.print_exc()
-          smaller_chunks = split_string_into_chunks(text_to_speak, 100) 
+          smaller_chunks = split_string_into_chunks(text_to_speak, 30) 
           print("This chunk is too long for xtts. Splitting into smaller chunks with split_string_into_chunks. This may cause irregular sentence splitting and may lead to blurring sounds. ")
           smaller_chunk_index = index 
           for small_chunk in smaller_chunks : 
@@ -187,7 +187,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         print("The current output_path is : " + output_path )
         traceback.print_exc()
         print("This chunk is too long for xtts. Splitting into smaller chunks with split_string_into_chunks. This may cause irregular sentence splitting and may lead to blurring sounds. ")
-        smaller_chunks = split_string_into_chunks(text_to_speak, 100) 
+        smaller_chunks = split_string_into_chunks(text_to_speak, 30) 
         smaller_chunk_index = index 
         for small_chunk in smaller_chunks : 
           output_path = book_name + "/" + book_name + f"_{index}.wav"
