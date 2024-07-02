@@ -137,7 +137,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
       LANGUAGE = chunk_language 
       chunk_chunks = split_text_into_sentences(chunk) 
       for chunk_index, chunk_chunk in enumerate(chunk_chunks) :
-        output_path = book_name + "/" + book_name + f"_{index}.wav"
+        output_path = book_name + "/" + book_name + f"_{chunk_index}.wav"
         text_to_speak = chunk_chunk 
         try: #AE1
           print("The current output_path is : " + output_path )
@@ -145,7 +145,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           with open(log_file_path, 'a', encoding='utf-8') as log_file:
             log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
             #log_file.write(f"AE1: {output_path}\n")
-          index += 1
+          chunk_index += 1
         except AssertionError: 
           print("The detected Chunk-Language is not supported by the xtts v2 model. Using " + TEXT_LANGUAGE + " instead." ) 
           print("An unexpected error was detected. The 400 token problem may have been the cause. ")
@@ -154,7 +154,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           print("This chunk is too long for xtts. Splitting into smaller chunks with split_string_into_chunks. This may cause irregular sentence splitting and may lead to blurring sounds. ")
           smaller_chunk_index = index 
           for small_chunk in smaller_chunks : 
-            output_path = book_name + "/" + book_name + f"_{index}.wav"
+            output_path = book_name + "/" + book_name + f"_{chunk_index}.wav"
             print("The current output-path is : " + output_path )
             text_to_speak = small_chunk 
             try: #AE2
@@ -162,7 +162,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
               with open(log_file_path, 'a', encoding='utf-8') as log_file:
                 log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                 #log_file.write(f"AE2: {output_path}\n")
-              index += 1
+              chunk_index += 1
             except Exception as e:
               print("skipping") 
               if LANGUAGE == "en" : 
@@ -172,7 +172,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                     #log_file.write(f"AE2: {output_path}\n")
-                  index += 1
+                  chunk_index += 1
                 except Exception as e:
                   print("Skipping") 
                   continue 
@@ -183,7 +183,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                     #log_file.write(f"AE2: {output_path}\n")
-                  index += 1
+                  chunk_index += 1
                 except Exception as e:
                   print("Skipping") 
                   continue 
@@ -194,6 +194,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           print("An unexpected error was detected. The 400 token problem may have been the cause. ")
           traceback.print_exc()
           continue 
+      index = chunk_index 
     else: 
       if language_detection_supported_for_textlanguage == True : 
         LANGUAGE = chunk_language 
