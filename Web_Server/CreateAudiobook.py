@@ -327,7 +327,8 @@ def clean_sentences(sentences):
     for sentence in sentences:
         try:
             for old_char, new_char in replacements.items():
-                sentence = re.sub(re.escape(old_char) + r'(\w+)?' + re.escape(old_char), new_char, sentence)
+                #sentence = re.sub(re.escape(old_char) + r'(\w+)?' + re.escape(old_char), new_char, sentence)
+                sentence = sentence.replace(old_char, new_char)
             cleaned_sentences.append(sentence)
         except Exception as e:
             print(f"Error processing sentence: {sentence}. Error: {e}")
