@@ -113,8 +113,6 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 500 ) -> list:
 def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
-  device = "cuda" if torch.cuda.is_available() else "cpu"
-  tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2").to(device)
   text = read_text_from_file(text_file_path)
   language_detection_supported_for_textlanguage = True 
   if LANGUAGE == "en" or LANGUAGE == "de" : 
@@ -130,6 +128,8 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
     language_detection_supported_for_textlanguage = False 
   index = 1  
   for l_index, chunk in enumerate(text_chunks) :
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2").to(device)
     chunk_language = detect(chunk) 
     if chunk_language != TEXT_LANGUAGE and language_detection_supported_for_textlanguage == True :  
       print("Detected a different language in the current chunk. ") 
