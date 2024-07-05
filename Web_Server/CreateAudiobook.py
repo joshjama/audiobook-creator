@@ -8,6 +8,7 @@ from pydub import AudioSegment
 from pydub.playback import play
 import torch
 from RenameAudios import * 
+from ConvertAudios import * 
 ## Splitting Text to Sentences with spacy : 
 import spacy
 from langdetect import detect
@@ -255,6 +256,10 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         print("An unexpected error was detected. The 400 token problem may have been the cause. ")
         traceback.print_exc()
         continue 
+  folder = book_name + '/' 
+  rename_audio_files(folder)
+  convert_audios(folder)
+  zip_mp3_files(folder, book_name) 
   print("Audiobook generation finished") 
 
 def read_text_from_file(file_path) : 
@@ -367,5 +372,5 @@ if __name__ == "__main__":
   else:  
     book_name = "Audiobook" 
   create_audio_tts(sys.argv[1], TEXT_LANGUAGE, book_name) 
-  audios_path = book_name + "/" 
-  rename_audio_files(audios_path)
+  #audios_path = book_name + "/" 
+  #rename_audio_files(audios_path)
