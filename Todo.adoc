@@ -22,7 +22,6 @@
 ** Im Momment kann die Textstelle in der audio_files_log.txt log - Datei nachvollzogen werden. Diese ist im jeweiligen Audiobook-Order abruhfbar. 
 * Log in browser 
 * Falsche Datein im Browser verstecken 
-* Auswahlfeld fuer die Stimme 
 * Alle von xtts unterstützten Sprachen bei den spacy model download im installer einfügen. 
 * Translation
 
@@ -36,3 +35,6 @@
 === Bugg-Fixes : 
 * Exception für maximum token anzahl für text und spacy oder xtts ueberschritten. 
 
+=== Feature-Requests : 
+
+* Auswahlfeld fuer die Stimme 
