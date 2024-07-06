@@ -1,5 +1,6 @@
 import sys 
 import os 
+import time 
 import traceback
 import re
 from TTS.api import TTS
@@ -13,6 +14,12 @@ from ConvertAudios import *
 import spacy
 from langdetect import detect
 from spacy.language import Language
+import ollama
+from ollama import Client
+
+#OLLAMA_URL = 'http://192.168.178.96:11434'
+#OLLAMA_URL = 'http://127.0.0.1:59124'
+OLLAMA_URL = 'http://localhost:11434'
 
 ## Usage : 
 #$ python ./CreateAudiobook.py /PATH_TO_TEXT your_books_name  
@@ -111,7 +118,7 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 500 ) -> list:
   sentences = sentences_finished 
   return sentences
 
-def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla' ) : 
+def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German" ) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
   text = read_text_from_file(text_file_path)
@@ -140,6 +147,9 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
       for chunk_index, chunk_chunk in enumerate(chunk_chunks) :
         output_path = book_name + "/" + book_name + f"_{chunk_index}.wav"
         text_to_speak = chunk_chunk 
+        if translation_enabled == True : 
+          text_to_speak =  translate_text(text_to_speak, translate_to) 
+          time.sleep(3)
         try: #AE1
           print("The current output_path is : " + output_path )
           tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
@@ -158,6 +168,9 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             output_path = book_name + "/" + book_name + f"_{chunk_index}.wav"
             print("The current output-path is : " + output_path )
             text_to_speak = small_chunk 
+            if translation_enabled == True : 
+              text_to_speak =  translate_text(text_to_speak, translate_to) 
+              time.sleep(3)
             try: #AE2
               tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
               with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -201,6 +214,9 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
         LANGUAGE = chunk_language 
       output_path = book_name + "/" + book_name + f"_{index}.wav"
       text_to_speak = chunk 
+      if translation_enabled == True : 
+        text_to_speak =  translate_text(text_to_speak, translate_to) 
+        time.sleep(3)
       try: #BE1
         print("The current output_path is : " + output_path )
         tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
@@ -220,6 +236,9 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
           output_path = book_name + "/" + book_name + f"_{index}.wav"
           print("The current output-path is : " + output_path )
           text_to_speak = small_chunk 
+          if translation_enabled == True : 
+            text_to_speak =  translate_text(text_to_speak, translate_to) 
+            time.sleep(3)
           try: #BE2
             tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
             with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -365,6 +384,27 @@ def remove_tabs_from_sentences(sentences):
             traceback.print_exc()
             cleaned_sentences.append(sentence)
     return cleaned_sentences
+
+def translate_text(text: str, target_language: str, model: str = "llama3") -> str:
+    """Translates text to the target language using a local Ollama instance."""
+    client = Client(host=OLLAMA_URL)
+    modelquery = f"Translate the following text exactly, without any changes or adding words, to {target_language}:\n {text}\n Make sure that the meaning of the original text are fully and accurately preserved. Use no additional explanations, and avoid any adjustments that are not strictly necessary to accurately translate the text into {target_language}. Do not add anything, just answer with the translated text."
+    
+    try:
+        print("Starting Translation. ")
+        print("Translating your text into : " + target_language )
+        print("Original Text : " )
+        print(text)
+        translation = ollama.generate(model=model, prompt=modelquery, stream=False)
+        print ('##TRANSLATION: '+ translation['response'])
+        del model
+        torch.cuda.empty_cache()
+        return translation['response'] 
+    except Exception as e:
+        print(f"Translation error: {e}")
+        traceback.print_exc()
+        print(f"Exception details: {e}")
+        return text
 
 if __name__ == "__main__": 
   if sys.argv[ len(sys.argv) - 1 ] != sys.argv[1] : 

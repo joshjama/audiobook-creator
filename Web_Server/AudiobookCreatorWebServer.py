@@ -14,6 +14,15 @@ ALLOWED_EXTENSIONS = {'txt'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(AUDIOBOOKS_FOLDER, exist_ok=True)
 
+# Global variable to control translation
+translation_enabled = False
+# Supported languages
+languages_supported = ['German', 'English']
+
+# Global variable for the selected language
+translate_to = 'German'
+
+
 # Te speaker idxs to select for xtts : 
 speaker_idxs = [
 'Claribel Dervla', 
@@ -84,7 +93,45 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global speaker_idx
+    global speaker_idx, translate_to, translation_enabled 
+    
+
+    
+    if 'toggle' in request.form:
+        toggle_value = request.form['toggle']
+        
+        if toggle_value == 'on':
+            translation_enabled = True
+        elif toggle_value == 'off':
+            translation_enabled = False
+        else:
+            # Invalid toggle value, set an error message
+            error_message = 'Invalid toggle value.'
+            #return render_template('index.html', languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, error=error_message)
+    else:
+        # Toggle parameter missing in the form, set an error message
+        error_message = 'Toggle parameter missing.'
+        #return render_template('index.html', languages=l
+        #return render_template_string('index.html', languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, error=error_message)
+
+    if request.method == 'POST':
+        # Check if the language parameter is present in the form
+        if 'language' in request.form:
+            selected_language = request.form['language']
+            
+            # Check if the selected language is in the list of supported languages
+            if selected_language in languages_supported:
+                translate_to = selected_language
+            else:
+                # Invalid language selected, set an error message
+                error_message = 'Invalid language selected.'
+                #return render_template('index.html', languages=languages_supported, selected_language=translate_to, error=error_message)
+        else:
+            # Language parameter missing in the form, set an error message
+            error_message = 'Language parameter missing.'
+            #return render_template('index.html', languages=languages_supported, selected_language=translate_to, error=error_message)
+
+
     if request.method == 'POST':
         try:
             selected_speaker = request.form['speaker']
@@ -111,6 +158,36 @@ def index():
         </script>
     </head>
     <body>
+    <h1>Language Selection</h1>
+    
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    
+    <form method="POST">
+        <select name="language">
+            {% for language in languages %}
+                <option value="{{ language }}" {% if language == selected_language %}selected{% endif %}>{{ language }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Select">
+    </form>
+    
+    <p>Selected Language: {{ selected_language }}</p>
+<form method="POST">
+    <div>
+        <input type="radio" id="toggle_on" name="toggle" value="on" {% if translation_enabled %}checked{% endif %}>
+        <label for="toggle_on">Translation On</label>
+    </div>
+    <div>
+        <input type="radio" id="toggle_off" name="toggle" value="off" {% if not translation_enabled %}checked{% endif %}>
+        <label for="toggle_off">Translation Off</label>
+    </div>
+    <input type="submit" value="Toggle Translation">
+</form>
+
+<p>Translation Enabled: {{ translation_enabled }}</p>
+
     <h1>Select Speaker</h1>
     <form method="post">
         <label for="speaker-select">Speaker:</label>
@@ -121,7 +198,7 @@ def index():
             {% endfor %}
         </select>
         <br><br>
-        <input type="submit" value="Auswählen">
+        <input type="submit" value="Select">
     </form>
 
         <h1>Text to Audiobook</h1>
@@ -145,7 +222,7 @@ def index():
         </ul>
     </body>
     </html>
-    ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER, speaker_idxs=speaker_idxs, selected_speaker=speaker_idx )
+    ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER, speaker_idxs=speaker_idxs, selected_speaker=speaker_idx, languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled )
 
 @app.route('/files/<folder>')
 def list_files(folder):
@@ -285,17 +362,17 @@ def upload_file():
         print('No text or file provided')
         return 'No text or file provided', 400
 
-    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx ))
+    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx, translation_enabled, translate_to ))
     thread.start()
     print('File uploaded and processing started')
 
     return redirect(url_for('index'))
 
-def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx):
+def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, translate_to ):
     os.makedirs(audiobook_folder, exist_ok=True)
     try:
         print(f'Starting audiobook creation for {file_path}')
-        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx )
+        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, translate_to )
         book_name = audiobook_folder.replace("/", "")  
         book_name = book_name.replace(".", "") 
         audios_path = book_name + "/" 
@@ -321,6 +398,11 @@ def download_file(folder, filename):
     except Exception as e:
         print(f'Error downloading file: {str(e)}')
         return f'Error downloading file: {str(e)}', 500
+
+#@app.route('/toggle_translation', methods=['POST'])
+#def toggle_translation():
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
