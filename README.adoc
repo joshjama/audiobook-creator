@@ -39,6 +39,16 @@ Usage :
 * We will add more languages in later releases. 
 * We need to download a spacy model for each language in order to split the book to sentences correctly. 
 
+=== Create Speaker - Samples : 
+
+* You can now select the speaker for your Audio-Book within a dropdown on the top of the Web_Server. 
+* You can create a sample wav-file for each supported speaker as follows. 
+* $ source audiobook_venv/bin/activate && \
+* $ cd create_voice_samples && \
+* $ python ./CreateVoiceSamples.py 
+* They will be created into subdirectories of the name of the speaker they applay to. 
+* You can just copy this wav-files into a custom folder under the Web_Server - Directory to be able to brows them from the frontend. 
+
 == Webserver : 
 === Attension ! Do only use it inside secure local or vpn - networks ! It is not ready to be used as service online !  
 
