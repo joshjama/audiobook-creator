@@ -64,6 +64,6 @@ speaker_idxs = [
 def create_voice_samples(): 
   for speaker_idx in speaker_idxs : 
     output_path = speaker_idx + "/" 
-    create_audio_tts("./snipet.txt", output_path, speaker_idx)
+    create_audio_tts("./snipet.txt", "de", output_path, speaker_idx)
 
 create_voice_samples() 
