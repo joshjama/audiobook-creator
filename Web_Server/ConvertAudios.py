@@ -27,7 +27,7 @@ def zip_mp3_files(folder, book_name):
     print(mp3_folder) 
     #mp3_folder = os.path.join("mp3")
     #os.chdir(folder)
-    os.chdir(mp3_folder)
+    #os.chdir(mp3_folder)
     #os.chdir(mp3_folder)
     #"/mp3"
     if not os.path.exists(mp3_folder):
