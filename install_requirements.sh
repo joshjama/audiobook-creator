@@ -38,7 +38,7 @@ install_requirements() {
   python3.10 -m venv audiobook_venv && \
   source ./audiobook_venv/bin/activate && \
   pip install --upgrade pip --timeout=10000000 && \
-  pip install TTS pydub spacy  langdetect flask --timeout=10000000 && \
+  pip install TTS pydub spacy  langdetect flask ollama --timeout=10000000 && \
   install_spacy_models && \
   ./check_requirements_pip_installed.sh && \
   check_spacy_model_install 2>&1 
