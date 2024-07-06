@@ -1,0 +1,3 @@
+"Hi! Das ist ein Testtext, um die Sprachsynthese zu prüfen. Wie klingt meine Stimme? Ich hoffe, sie gefällt dir! Stell dir vor, ich könnte dein nächstes Hörbuch vorlesen. Wäre das nicht fantastisch? Mit meiner Stimme würden die Charaktere und Geschichten lebendig werden. Lass es mich wissen, wenn du mich für dein Projekt engagieren möchtest! 
+
+This is a test to check the speech synthesis. How does my voice sound? I hope you like it! Imagine me narrating your next audiobook. Wouldn't that be amazing?"
