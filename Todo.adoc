@@ -24,7 +24,8 @@
 * Falsche Datein im Browser verstecken 
 * Alle von xtts unterstützten Sprachen bei den spacy model download im installer einfügen. 
 * Translation
-** Possible, but not on the same gpu. 
+* Just works with the first chunk until now as if we need to make new chunks after translating as if the sentences do not automaticaly fit the limits. 
+* I get a memory-error for my vram, but did not reach to find the cause of this problem. 
 ** We need to seperate the translation from the tts-creation. 
 ** It may also be required to delete the ollama-model from the vram of the gpu manualy. 
 * Installation of ollama-server within the requirements-install. 
