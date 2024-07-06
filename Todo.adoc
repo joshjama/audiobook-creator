@@ -5,15 +5,11 @@
 
 
 
-== XTTS can only process texts to a size of 400 tokens problem : 
-
-* When text-file greater then 10000 chars : the followin error is shown : xtts can only process 400 token 
-* That may also be caused by copyright caractors or to long sentences. 
-
 
 == Bugg-Fixes: 
 
 * Chunklänge für sehr lange auflistung überprüfen wird anscheinend manchmal zu lang gelassen 
+** Wird im Momment mit zwei verschachtelten Exceptions abgefangen. Innerhalb der innersten Ebene wird fals der Chunk immer noch zu lang für die 400 - token - Grenze von xtts ist eine Fehlermeldung im Resultierenden Audio gesprochen. 
 * Die license von cockwi tts akzeptieren im browser möglich machen durch den pflask server 
 * Pyenv  für die installation der version 3.10 benutzen bevor der installer ausgeführt wird 
 * Normalisierung der wav 
@@ -23,10 +19,20 @@
 
 
 * Text  im player anzeigen  dafür chunks  auf speichern 
+** Im Momment kann die Textstelle in der audio_files_log.txt log - Datei nachvollzogen werden. Diese ist im jeweiligen Audiobook-Order abruhfbar. 
 * Log in browser 
-* Exception für maximum token anzahl für text und spacy oder xtts ueberschritten. 
 * Falsche Datein im Browser verstecken 
 * Auswahlfeld fuer die Stimme 
 * Alle von xtts unterstützten Sprachen bei den spacy model download im installer einfügen. 
 * Translation
+
+== Solved : 
+
+=== XTTS can only process texts to a size of 400 tokens problem : 
+
+* When text-file greater then 10000 chars : the followin error is shown : xtts can only process 400 token 
+* That may also be caused by copyright caractors or to long sentences. 
+
+=== Bugg-Fixes : 
+* Exception für maximum token anzahl für text und spacy oder xtts ueberschritten. 
 

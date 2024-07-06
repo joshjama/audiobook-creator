@@ -453,27 +453,19 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_xtts_can_only_process_texts_to_a_size_of_400_tokens_problem">XTTS can only process texts to a size of 400 tokens problem :</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>When text-file greater then 10000 chars : the followin error is shown : xtts can only process 400 token</p>
-</li>
-<li>
-<p>That may also be caused by copyright caractors or to long sentences.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="_bugg_fixes">Bugg-Fixes:</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
 <p>Chunklänge für sehr lange auflistung überprüfen wird anscheinend manchmal zu lang gelassen</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Wird im Momment mit zwei verschachtelten Exceptions abgefangen. Innerhalb der innersten Ebene wird fals der Chunk immer noch zu lang für die 400 - token - Grenze von xtts ist eine Fehlermeldung im Resultierenden Audio gesprochen.</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p>Die license von cockwi tts akzeptieren im browser möglich machen durch den pflask server</p>
@@ -498,12 +490,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul>
 <li>
 <p>Text  im player anzeigen  dafür chunks  auf speichern</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Im Momment kann die Textstelle in der audio_files_log.txt log - Datei nachvollzogen werden. Diese ist im jeweiligen Audiobook-Order abruhfbar.</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p>Log in browser</p>
-</li>
-<li>
-<p>Exception für maximum token anzahl für text und spacy oder xtts ueberschritten.</p>
 </li>
 <li>
 <p>Falsche Datein im Browser verstecken</p>
@@ -521,10 +517,38 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_solved">Solved :</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_xtts_can_only_process_texts_to_a_size_of_400_tokens_problem">XTTS can only process texts to a size of 400 tokens problem :</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>When text-file greater then 10000 chars : the followin error is shown : xtts can only process 400 token</p>
+</li>
+<li>
+<p>That may also be caused by copyright caractors or to long sentences.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_bugg_fixes_2">Bugg-Fixes :</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Exception für maximum token anzahl für text und spacy oder xtts ueberschritten.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-06-29 17:01:05 +0200
+Last updated 2024-07-06 09:56:17 +0200
 </div>
 </div>
 </body>
