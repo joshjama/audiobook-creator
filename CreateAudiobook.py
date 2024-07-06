@@ -111,7 +111,7 @@ def split_text_into_sentences(text: str, max_length_chunk: int = 500 ) -> list:
   sentences = sentences_finished 
   return sentences
 
-def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) : 
+def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla' ) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
   text = read_text_from_file(text_file_path)
@@ -142,7 +142,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
         text_to_speak = chunk_chunk 
         try: #AE1
           print("The current output_path is : " + output_path )
-          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
           with open(log_file_path, 'a', encoding='utf-8') as log_file:
             log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
             #log_file.write(f"AE1: {output_path}\n")
@@ -159,7 +159,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
             print("The current output-path is : " + output_path )
             text_to_speak = small_chunk 
             try: #AE2
-              tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+              tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
               with open(log_file_path, 'a', encoding='utf-8') as log_file:
                 log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                 #log_file.write(f"AE2: {output_path}\n")
@@ -169,7 +169,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
               if LANGUAGE == "en" : 
                 text_to_speak = "Sorry, this sentences seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
                 try: #AE2
-                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                     #log_file.write(f"AE2: {output_path}\n")
@@ -180,7 +180,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
               elif LANGUAGE == "de" : 
                 text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
                 try: #AE2
-                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                     #log_file.write(f"AE2: {output_path}\n")
@@ -203,7 +203,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
       text_to_speak = chunk 
       try: #BE1
         print("The current output_path is : " + output_path )
-        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
         with open(log_file_path, 'a', encoding='utf-8') as log_file:
           log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
           #log_file.write(f"BE1: {output_path}\n")
@@ -221,7 +221,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
           print("The current output-path is : " + output_path )
           text_to_speak = small_chunk 
           try: #BE2
-            tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+            tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
             with open(log_file_path, 'a', encoding='utf-8') as log_file:
               log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
               #log_file.write(f"BE2: {output_path}\n")
@@ -231,7 +231,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
             if LANGUAGE == "en" : 
               text_to_speak = "Sorry, this sentences seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
               try: #AE2
-                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                   log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                   #log_file.write(f"AE2: {output_path}\n")
@@ -242,7 +242,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook" ) :
             elif LANGUAGE == "de" : 
               text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
               try: #AE2
-                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker='Claribel Dervla', language=LANGUAGE)
+                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                   log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                   #log_file.write(f"AE2: {output_path}\n")

@@ -14,11 +14,89 @@ ALLOWED_EXTENSIONS = {'txt'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(AUDIOBOOKS_FOLDER, exist_ok=True)
 
+# Te speaker idxs to select for xtts : 
+speaker_idxs = [
+'Claribel Dervla', 
+'Daisy Studious', 
+'Gracie Wise', 
+'Tammie Ema', 
+'Alison Dietlinde', 
+'Ana Florence', 
+'Annmarie Nele', 
+'Asya Anara', 
+'Brenda Stern', 
+'Gitta Nikolina', 
+'Henriette Usha', 
+'Sofia Hellen', 
+'Tammy Grit', 
+'Tanja Adelina', 
+'Vjollca Johnnie', 
+'Andrew Chipper', 
+'Badr Odhiambo', 
+'Dionisio Schuyler', 
+'Royston Min', 
+'Viktor Eka', 
+'Abrahan Mack', 
+'Adde Michal', 
+'Baldur Sanjin', 
+'Craig Gutsy', 
+'Damien Black', 
+'Gilberto Mathias', 
+'Ilkin Urbano', 
+'Kazuhiko Atallah', 
+'Ludvig Milivoj', 
+'Suad Qasim', 
+'Torcull Diarmuid', 
+'Viktor Menelaos', 
+'Zacharie Aimilios', 
+'Nova Hogarth', 
+'Maja Ruoho', 
+'Uta Obando', 
+'Lidiya Szekeres', 
+'Chandra MacFarland', 
+'Szofi Granger', 
+'Camilla Holmström', 
+'Lilya Stainthorpe', 
+'Zofija Kendrick', 
+'Narelle Moon', 
+'Barbora MacLean', 
+'Alexandra Hisakawa', 
+'Alma María', 
+'Rosemary Okafor', 
+'Ige Behringer', 
+'Filip Traverse', 
+'Damjan Chapman', 
+'Wulf Carlevaro', 
+'Aaron Dreschner', 
+'Kumar Dahl', 
+'Eugenio Mataracı', 
+'Ferran Simen', 
+'Xavier Hayasaka', 
+'Luis Moray', 
+'Marcos Rudaski'
+] 
+
+#Speaker to select via drop-down : 
+speaker_idx = ''
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    global speaker_idx
+    if request.method == 'POST':
+        try:
+            selected_speaker = request.form['speaker']
+            if selected_speaker in speaker_idxs:
+                speaker_idx = selected_speaker
+            else:
+                raise ValueError('Ungültiger Sprecher ausgewählt')
+        except KeyError:
+            pass  # Kein Sprecher ausgewählt
+        except ValueError as e:
+            print(f"Fehler: {str(e)}")
+
     audiobook_folders = [f for f in os.listdir('.') if os.path.isdir(os.path.join('.', f))]
     return render_template_string('''
     <!DOCTYPE html>
@@ -33,6 +111,19 @@ def index():
         </script>
     </head>
     <body>
+    <h1>Sprecher auswählen</h1>
+    <form method="post">
+        <label for="speaker-select">Sprecher:</label>
+        <select name="speaker" id="speaker-select">
+            <option value="">Bitte auswählen</option>
+            {% for speaker in speaker_idxs %}
+                <option value="{{ speaker }}" {% if speaker == selected_speaker %}selected{% endif %}>{{ speaker }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <input type="submit" value="Auswählen">
+    </form>
+
         <h1>Text to Audiobook</h1>
         <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
             <label for="text">Enter text:</label><br>
@@ -54,7 +145,7 @@ def index():
         </ul>
     </body>
     </html>
-    ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER)
+    ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER, speaker_idxs=speaker_idxs, selected_speaker=speaker_idx )
 
 @app.route('/files/<folder>')
 def list_files(folder):
@@ -194,21 +285,21 @@ def upload_file():
         print('No text or file provided')
         return 'No text or file provided', 400
 
-    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder))
+    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx ))
     thread.start()
     print('File uploaded and processing started')
 
     return redirect(url_for('index'))
 
-def create_audio_tts_with_logging(file_path, text_language, audiobook_folder):
+def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx):
     os.makedirs(audiobook_folder, exist_ok=True)
     try:
         print(f'Starting audiobook creation for {file_path}')
-        create_audio_tts(file_path, text_language, audiobook_folder)
+        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx )
         book_name = audiobook_folder.replace("/", "")  
         book_name = book_name.replace(".", "") 
         audios_path = book_name + "/" 
-        rename_audio_files(audios_path) 
+        #rename_audio_files(audios_path) 
         print(f'Audiobook creation completed for {file_path}')
     except Exception as e:
         print(f'Error during audiobook creation: {str(e)}')
