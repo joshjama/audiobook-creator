@@ -111,11 +111,11 @@ def index():
         </script>
     </head>
     <body>
-    <h1>Sprecher auswählen</h1>
+    <h1>Select Speaker</h1>
     <form method="post">
-        <label for="speaker-select">Sprecher:</label>
+        <label for="speaker-select">Speaker:</label>
         <select name="speaker" id="speaker-select">
-            <option value="">Bitte auswählen</option>
+            <option value="">Please select a speaker.</option>
             {% for speaker in speaker_idxs %}
                 <option value="{{ speaker }}" {% if speaker == selected_speaker %}selected{% endif %}>{{ speaker }}</option>
             {% endfor %}
