@@ -368,7 +368,7 @@ def upload_file():
 
     return redirect(url_for('index'))
 
-def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, translate_to ):
+def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx='Claribel Dervla', translation_enabled=False, translate_to='German' ):
     os.makedirs(audiobook_folder, exist_ok=True)
     try:
         print(f'Starting audiobook creation for {file_path}')
