@@ -15,7 +15,8 @@ def rename_audio_files(directory):
         return
     
     # Filtere nur die Dateien, die dem Muster entsprechen
-    audio_files = [f for f in files if re.match(r'.*_\d+\.wav$', f)]
+    #audio_files = [f for f in files if re.match(r'.*_\d+\.wav$', f)]
+    audio_files = sorted([f for f in files if re.match(r'.*_\d+\.wav$', f)])
     
     if not audio_files:
         print("No matching audiofiles found.")
