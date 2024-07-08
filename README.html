@@ -467,13 +467,44 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_requirements">Requirements :</h2>
 <div class="sectionbody">
 <div class="ulist">
-<div class="title">Requirements :</div>
+<div class="title">Main-Requirements :</div>
 <ul>
 <li>
 <p>python3.10-pip</p>
 </li>
 <li>
 <p>python3-virtualenv</p>
+</li>
+<li>
+<p>Additional :</p>
+<div class="ulist">
+<ul>
+<li>
+<p>A working cuda setup together with a Nvidea-GPU of at least 8 GB of vram.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist">
+<div class="title">Translation-Requirements :</div>
+<ul>
+<li>
+<p>For the translation-feature you will need a working ollama-server up and running.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>You can adjust the url of your ollama-server inside the CreateAudiobook.py.</p>
+</li>
+<li>
+<p>$ OLLAMA_URL = 'http://localhost:11434' # For your leptops GPU.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>A working cuda setup together with a Nvidea-GPU of at least 8 GB of vram.</p>
 </li>
 </ul>
 </div>
@@ -619,6 +650,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>You can translate texts from english to german and wise versa.</p>
 </li>
 <li>
+<p>You can translate any other language to English or German.</p>
+</li>
+<li>
+<p>Please keep in mind that non - supported languages may leed to unusual sentense-splitting.</p>
+</li>
+<li>
 <p>Just use the toggle-button on the web-frontend.</p>
 </li>
 <li>
@@ -631,15 +668,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li>
 <p>Always check importent information.</p>
 </li>
-</ul>
-</div>
-</li>
 <li>
-<p>Please note also that translating is not yet supported to be run on the same gpu that the tts is working on. Especialy if your vram is not larger then 24 GB.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Just try it out, there may bee memory-problems.</p>
+<p>Just try it out, translations may be incorrect or missmatching parts of your text. I am working on better results.</p>
 </li>
 </ul>
 </div>
@@ -652,7 +682,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-07-06 17:41:59 +0200
+Last updated 2024-07-08 15:24:57 +0200
 </div>
 </div>
 </body>
