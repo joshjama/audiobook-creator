@@ -61,7 +61,11 @@ def determine_paragraphs_max_length(paragraphs):
 def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list: 
   """Teilt den Text in Sätze, mit Berücksichtigung der maximalen Länge."""
   language_code = TEXT_LANGUAGE  
-  nlp = load_model(language_code)
+  try: 
+    nlp = load_model(language_code)
+  except ValueError as VE : 
+    sentences = split_string_into_chunks(text) 
+    return sentences 
   nlp.max_length = len(text) + 1
   try: 
     doc = nlp(text)
