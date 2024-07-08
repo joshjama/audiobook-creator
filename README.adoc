@@ -27,6 +27,7 @@
 .Installation :  
 * Just run the following to install the Python modules  
 * $ ./install_requirements.sh  
+* Please note that you have to run the create_audiobook.sh ones after installation in order to be able to axcept the license. 
 
 == Usage :  
 
