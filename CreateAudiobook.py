@@ -118,7 +118,8 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   print("Cleaning text from unwanted linebreaks. ") 
   paragraphs_with_lines = clean_line_breaks(paragraphs_with_rong_linebrakes) 
   print("Replacing tabs \t with spaces. ")
-  paragraphs_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
+  paragraphs_nearly_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
+  paragraphs_finished = convert_to_utf8(paragraphs_nearly_finished) 
   paragraphs = paragraphs_finished 
   return paragraphs
 
@@ -328,7 +329,8 @@ def split_string_into_chunks(input_string, chunk_size=500 ) :
         current_chunk = paragraph + " "
   if current_chunk:
     chunks.append(current_chunk.strip())
-  return chunks
+  chunks_finished = convert_to_utf8(chunks) 
+  return chunks_finished 
 
 def create_directory_from_book_name(book_name="Example_book") : 
     sanitized_book_name = book_name.replace('/', '_').replace('\\', '_')
@@ -444,6 +446,101 @@ def translate_text_chunks(text_chunks, target_language, language_support ) -> li
     translated_text_chunks = split_string_into_chunks(translated_text )
     
   return translated_text_chunks 
+
+import re
+
+import re
+import unicodedata
+
+def replace_non_unicode_chars(sentences):
+    try:
+        converted_sentences = []
+        for sentence in sentences:
+            # Entferne alle nicht-druckbaren Zeichen (außer Zeilenumbrüche)
+            sentence = re.sub(r'[^\x20-\x7E\n\r\t]', '', sentence)
+            
+            # Ersetze alle nicht-ASCII-Zeichen durch ihre Unicode-Entsprechungen
+            sentence = sentence.encode('ascii', 'ignore').decode('utf-8')
+            
+            # Ersetze Umlaute durch ihre entsprechenden Buchstabenkombinationen
+            sentence = sentence.replace('ä', 'ae')
+            sentence = sentence.replace('ö', 'oe')
+            sentence = sentence.replace('ü', 'ue')
+            sentence = sentence.replace('Ä', 'Ae')
+            sentence = sentence.replace('Ö', 'Oe')
+            sentence = sentence.replace('Ü', 'Ue')
+            sentence = sentence.replace('ß', 'ss')
+            
+            # Normalisiere den Satz, um kombinierte Zeichen zu ersetzen
+            sentence = unicodedata.normalize('NFKD', sentence)
+            
+            converted_sentences.append(sentence)
+        
+        return converted_sentences
+    
+    except TypeError as e:
+        print(f"Fehler: Ungültiger Eingabetyp. Erwartet wird eine Liste von Strings. {e}")
+        return []
+    
+    except Exception as e:
+        print(f"Ein unerwarteter Fehler ist aufgetreten: {e}")
+        return []
+
+def old_replace_non_unicode_chars(sentences):
+    try:
+        converted_sentences = []
+        for sentence in sentences:
+            # Entferne alle nicht-druckbaren Zeichen (außer Zeilenumbrüche)
+            #sentence = re.sub(r'[^\x20-\x7E\n\r\t]', '', sentence)
+            
+            # Ersetze alle nicht-ASCII-Zeichen durch ihre Unicode-Entsprechungen
+            sentence = sentence.encode('ascii', 'ignore').decode('utf-8')
+            
+            converted_sentences.append(sentence)
+        
+        return converted_sentences
+    
+    except TypeError as e:
+        print(f"Fehler: Ungültiger Eingabetyp. Erwartet wird eine Liste von Strings. {e}")
+        return []
+    
+    except Exception as e:
+        print(f"Ein unerwarteter Fehler ist aufgetreten: {e}")
+        return []
+
+def convert_to_utf8(sentences):
+    """
+    Konvertiert eine Liste von Sätzen in den UTF-8-Zeichensatz.
+    
+    :param sentences: Liste von Sätzen als Strings
+    :return: Liste der konvertierten Sätze in UTF-8
+    """
+    print("Converting Sentences to utf-8") 
+    converted_sentences = []
+    
+    for sentence in sentences:
+        try:
+            # Konvertiere den Satz in UTF-8
+            converted_sentence = sentence.encode('utf-8', errors='strict').decode('utf-8')
+            converted_sentences.append(converted_sentence)
+        except UnicodeEncodeError as e:
+            # Fange Kodierungsfehler ab und gib eine Warnung aus
+            print(f"Warnung: Satz konnte nicht vollständig in UTF-8 konvertiert werden: {sentence}")
+            print(f"Fehlerdetails: {e}")
+            
+            # Versuche, den Satz mit einer Ersatzdarstellung für ungültige Zeichen zu konvertieren
+            converted_sentence = sentence.encode('utf-8', errors='replace').decode('utf-8')
+            converted_sentences.append(converted_sentence)
+        except Exception as e:
+            # Fange alle anderen Ausnahmen ab und gib eine Fehlermeldung aus
+            print(f"Fehler bei der Konvertierung des Satzes: {sentence}")
+            print(f"Fehlerdetails: {e}")
+            
+            # Füge den ursprünglichen Satz unverändert hinzu, um Datenverlust zu vermeiden
+            converted_sentences.append(sentence)
+    
+    return converted_sentences
+
 
 
 if __name__ == "__main__": 
