@@ -353,7 +353,7 @@ def split_string_into_chunks(input_string, chunk_size=500 ) :
   paragraphs_nearly_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
   #paragraphs_finished = convert_to_utf8(paragraphs_nearly_finished) 
   paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_nearly_finished) 
-  paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_ln)  
+  paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_nl)  
   paragraphs = paragraphs_finished 
   return paragraphs
 
