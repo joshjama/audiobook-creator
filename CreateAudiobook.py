@@ -119,7 +119,8 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs_with_lines = clean_line_breaks(paragraphs_with_rong_linebrakes) 
   print("Replacing tabs \t with spaces. ")
   paragraphs_nearly_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
-  paragraphs_finished = convert_to_utf8(paragraphs_nearly_finished) 
+  paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_nearly_finished) 
+  paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_nl)  
   paragraphs = paragraphs_finished 
   return paragraphs
 
@@ -175,6 +176,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
         try: #AE1
           print("The current output_path is : " + output_path )
           tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+          time.sleep(3) 
           with open(log_file_path, 'a', encoding='utf-8') as log_file:
             log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
             #log_file.write(f"AE1: {output_path}\n")
@@ -195,6 +197,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               #time.sleep(3)
             try: #AE2
               tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+              time.sleep(3) 
               with open(log_file_path, 'a', encoding='utf-8') as log_file:
                 log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                 #log_file.write(f"AE2: {output_path}\n")
@@ -205,6 +208,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
                 text_to_speak = "Sorry, this paragraphs seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
                 try: #AE2
                   tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+                  time.sleep(3) 
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                     #log_file.write(f"AE2: {output_path}\n")
@@ -216,6 +220,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
                 text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
                 try: #AE2
                   tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+                  time.sleep(3) 
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                     #log_file.write(f"AE2: {output_path}\n")
@@ -242,6 +247,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
       try: #BE1
         print("The current output_path is : " + output_path )
         tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+        time.sleep(3) 
         with open(log_file_path, 'a', encoding='utf-8') as log_file:
           log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
           #log_file.write(f"BE1: {output_path}\n")
@@ -263,6 +269,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             #time.sleep(3)
           try: #BE2
             tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+            time.sleep(3) 
             with open(log_file_path, 'a', encoding='utf-8') as log_file:
               log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
               #log_file.write(f"BE2: {output_path}\n")
@@ -273,6 +280,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               text_to_speak = "Sorry, this paragraphs seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
               try: #AE2
                 tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+                time.sleep(3) 
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                   log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                   #log_file.write(f"AE2: {output_path}\n")
@@ -284,6 +292,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
               try: #AE2
                 tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+                time.sleep(3) 
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                   log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
                   #log_file.write(f"AE2: {output_path}\n")
@@ -299,7 +308,9 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
         continue 
   folder = book_name + '/' 
   rename_audio_files(folder)
+  time.sleep(3) 
   convert_audios(folder)
+  time.sleep(3) 
   zip_mp3_files(folder, book_name) 
   print("Audiobook generation finished") 
 
@@ -340,7 +351,9 @@ def split_string_into_chunks(input_string, chunk_size=500 ) :
   paragraphs_with_lines = clean_line_breaks(paragraphs_with_rong_linebrakes) 
   print("Replacing tabs \t with spaces. ")
   paragraphs_nearly_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
-  paragraphs_finished = convert_to_utf8(paragraphs_nearly_finished) 
+  #paragraphs_finished = convert_to_utf8(paragraphs_nearly_finished) 
+  paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_nearly_finished) 
+  paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_ln)  
   paragraphs = paragraphs_finished 
   return paragraphs
 
@@ -552,6 +565,31 @@ def convert_to_utf8(sentences):
             converted_sentences.append(sentence)
     
     return converted_sentences
+
+import re
+
+def insert_spaces_before_newLine(sentences):
+    output = []
+    for sentence in sentences:
+        try:
+            # Füge Leerzeichen nach Satzzeichen ein, wenn ein Zeilenumbruch folgt (mit re.sub)
+            sentence = re.sub(r'([.!?])(\r\n|\r|\n)', r'\1 \2', sentence)
+            
+            # Füge Leerzeichen nach Satzzeichen ein, wenn ein Zeilenumbruch folgt (mit replace)
+            sentence = sentence.replace(".\n", ". \n")
+            sentence = sentence.replace("!\n", "! \n")
+            sentence = sentence.replace("?\n", "? \n")
+            sentence = sentence.replace(".\r\n", ". \r\n")
+            sentence = sentence.replace("!\r\n", "! \r\n")
+            sentence = sentence.replace("?\r\n", "? \r\n")
+            
+            output.append(sentence)
+        except:
+            # Wenn ein Fehler auftritt, füge den ursprünglichen Satz unverändert hinzu
+            output.append(sentence)
+    
+    return output
+
 
 
 
