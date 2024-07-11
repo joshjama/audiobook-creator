@@ -329,8 +329,20 @@ def split_string_into_chunks(input_string, chunk_size=500 ) :
         current_chunk = paragraph + " "
   if current_chunk:
     chunks.append(current_chunk.strip())
-  chunks_finished = convert_to_utf8(chunks) 
-  return chunks_finished 
+
+  #chunks_finished = convert_to_utf8(chunks) 
+  #return chunks_finished 
+  print("Cleaning paragraphs from unusual characters. This may take some time ... ") 
+  cleaned_paragraphs = clean_paragraphs(chunks) 
+  paragraphs_with_rong_linebrakes = cleaned_paragraphs 
+
+  print("Cleaning text from unwanted linebreaks. ") 
+  paragraphs_with_lines = clean_line_breaks(paragraphs_with_rong_linebrakes) 
+  print("Replacing tabs \t with spaces. ")
+  paragraphs_nearly_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
+  paragraphs_finished = convert_to_utf8(paragraphs_nearly_finished) 
+  paragraphs = paragraphs_finished 
+  return paragraphs
 
 def create_directory_from_book_name(book_name="Example_book") : 
     sanitized_book_name = book_name.replace('/', '_').replace('\\', '_')
