@@ -119,7 +119,8 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs_with_lines = clean_line_breaks(paragraphs_with_rong_linebrakes) 
   print("Replacing tabs \t with spaces. ")
   paragraphs_nearly_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
-  paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_nearly_finished) 
+  paragraphs_with_single_sc = replace_special_characters_following(paragraphs_nearly_finished)
+  paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_with_single_sc) 
   paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_nl)  
   paragraphs = paragraphs_finished 
   return paragraphs
@@ -127,7 +128,10 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
 def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German" ) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
-  text = read_text_from_file(text_file_path)
+  #text = read_text_from_file(text_file_path)
+  input_text = read_text_from_file(text_file_path)
+  text = replace_enumeration_separators(input_text) 
+  
   language_detection_supported_for_textlanguage = True 
   if LANGUAGE == "en" or LANGUAGE == "de" : 
     LANGUAGE = TEXT_LANGUAGE 
@@ -351,8 +355,10 @@ def split_string_into_chunks(input_string, chunk_size=500 ) :
   paragraphs_with_lines = clean_line_breaks(paragraphs_with_rong_linebrakes) 
   print("Replacing tabs \t with spaces. ")
   paragraphs_nearly_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
+  paragraphs_with_single_sc = replace_special_characters_following(paragraphs_nearly_finished)
+  paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_with_single_sc) 
   #paragraphs_finished = convert_to_utf8(paragraphs_nearly_finished) 
-  paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_nearly_finished) 
+  #paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_nearly_finished) 
   paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_nl)  
   paragraphs = paragraphs_finished 
   return paragraphs
@@ -589,6 +595,76 @@ def insert_spaces_before_newLine(sentences):
             output.append(sentence)
     
     return output
+
+def replace_special_characters_following(sentences):
+    """
+    Ersetzt in einer Liste von Sätzen jede Folge von Sonderzeichen, die aus 4 oder mehr
+    gleichen Zeichen besteht, durch ein einziges dieser Zeichen.
+
+    :param sentences: Eine Liste von Sätzen als Eingabe.
+    :return: Eine Liste der bearbeiteten Sätze.
+    """
+    processed_sentences = []
+    for sentence in sentences:
+        try:
+            # Überprüfen, ob der Satz eine Zeichenkette ist
+            if not isinstance(sentence, str):
+                raise TypeError(f"Ungültiger Satztyp: {type(sentence)}. Erwartet wird str.")
+
+            # Ersetzen von Folgen von Sonderzeichen durch ein einziges Zeichen
+            for char in set(sentence):
+                if not char.isalnum() and not char.isspace():
+                    pattern = char * 4
+                    replacement = char
+                    sentence = sentence.replace(pattern, replacement)
+
+            processed_sentences.append(sentence)
+
+        except TypeError as e:
+            print(f"Warnung: {str(e)}. Der Satz wird unverändert hinzugefügt.")
+            processed_sentences.append(sentence)
+
+        except Exception as e:
+            print(f"Warnung: Ein unerwarteter Fehler ist aufgetreten: {str(e)}. Der Satz wird unverändert hinzugefügt.")
+            processed_sentences.append(sentence)
+
+    return processed_sentences
+
+import re
+
+def replace_enumeration_separators(text):
+    """
+    Ersetzt die Punkte in Aufzählungen durch Kommas und lässt den Rest des Textes unverändert.
+
+    :param text: Ein String als Eingabe.
+    :return: Der modifizierte String.
+    """
+    try:
+        # Überprüfen, ob der Eingabetext eine Zeichenkette ist
+        if not isinstance(text, str):
+            raise TypeError(f"Ungültiger Eingabetyp: {type(text)}. Erwartet wird str.")
+
+        # Regulärer Ausdruck, um Aufzählungen im Format "1.2.1" zu finden
+        pattern = r'\b(\d+(?:\.\d+)+)\b'
+
+        # Funktion, um die Punkte in den gefundenen Aufzählungen durch Kommas zu ersetzen
+        def replace_dots(match):
+            return match.group().replace('.', ', ')
+
+        # Anwenden des regulären Ausdrucks auf den Text und Ersetzen der Punkte durch Kommas
+        modified_text = re.sub(pattern, replace_dots, text)
+
+        return modified_text
+
+    except TypeError as e:
+        print(f"Fehler: {str(e)}")
+        return text
+
+    except Exception as e:
+        print(f"Ein unerwarteter Fehler ist aufgetreten: {str(e)}")
+        return text
+
+
 
 
 
