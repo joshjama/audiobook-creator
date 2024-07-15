@@ -126,7 +126,7 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs = paragraphs_finished 
   return paragraphs
 
-def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German" ) : 
+def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German", temperature=0.5) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
   text = read_text_from_file(text_file_path)
@@ -143,7 +143,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
     # Testing : 
     #translation_enabled == True 
     if translation_enabled == True : 
-      text_chunks_translated = translate_text_chunks(text_chunks, translate_to, True) 
+      text_chunks_translated = translate_text_chunks(text_chunks, translate_to, True ) 
       text_chunks = []
       text_chunks = text_chunks_translated 
       time.sleep(10)
@@ -154,7 +154,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
     text_chunks = split_string_into_chunks(text, 200)
     language_detection_supported_for_textlanguage = False 
     if translation_enabled == True : 
-      text_chunks_translated = translate_text_chunks(text_chunks, translate_to, True) 
+      text_chunks_translated = translate_text_chunks(text_chunks, translate_to, True ) 
       text_chunks = []
       text_chunks = text_chunks_translated 
       if translate_to == "German" : 
@@ -180,7 +180,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
           #time.sleep(3)
         try: #AE1
           print("The current output_path is : " + output_path )
-          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
           time.sleep(3) 
           with open(log_file_path, 'a', encoding='utf-8') as log_file:
             log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -201,7 +201,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               #text_to_speak =  translate_text(text_to_speak, translate_to) 
               #time.sleep(3)
             try: #AE2
-              tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+              tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
               time.sleep(3) 
               with open(log_file_path, 'a', encoding='utf-8') as log_file:
                 log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -212,7 +212,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               if LANGUAGE == "en" : 
                 text_to_speak = "Sorry, this paragraphs seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
                 try: #AE2
-                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
                   time.sleep(3) 
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -224,7 +224,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               elif LANGUAGE == "de" : 
                 text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
                 try: #AE2
-                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
                   time.sleep(3) 
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -251,7 +251,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
         #time.sleep(3)
       try: #BE1
         print("The current output_path is : " + output_path )
-        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
         time.sleep(3) 
         with open(log_file_path, 'a', encoding='utf-8') as log_file:
           log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -273,7 +273,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             #text_to_speak =  translate_text(text_to_speak, translate_to) 
             #time.sleep(3)
           try: #BE2
-            tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+            tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
             time.sleep(3) 
             with open(log_file_path, 'a', encoding='utf-8') as log_file:
               log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -284,7 +284,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             if LANGUAGE == "en" : 
               text_to_speak = "Sorry, this paragraphs seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
               try: #AE2
-                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
                 time.sleep(3) 
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                   log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -296,7 +296,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             elif LANGUAGE == "de" : 
               text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
               try: #AE2
-                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE)
+                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
                 time.sleep(3) 
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                   log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -688,7 +688,7 @@ def third_old_convert_numbers_to_words(paragraphs, language):
                 if '/' in number:
                     # Brüche behandeln
                     numerator, denominator = number.split('/')
-                    number_word = num2words(int(numerator), lang=language) + ' ' + num2words(int(denominator), lang=language, ordinal=True)
+                    number_word = num2words(int(numerator), lang=language) + ' ' + num2words(int(denominator), lang=language, ordinal=True )
                 elif any(char in number for char in ['€', '$', '£', '¥']):
                     # Währungsbeträge behandeln
                     number = number.replace(',', '.').replace(' ', '')
