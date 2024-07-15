@@ -121,16 +121,17 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs_nearly_finished = remove_tabs_from_paragraphs(paragraphs_with_lines)
   paragraphs_with_single_sc = replace_special_characters_following(paragraphs_nearly_finished)
   paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_with_single_sc) 
-  paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_nl)  
+  paragraphs_with_numbers_as_words = convert_numbers_to_words(paragraphs_without_spaces_before_nl, language_code ) 
+  paragraphs_finished = insert_spaces_before_newLine(paragraphs_with_numbers_as_words)  
   paragraphs = paragraphs_finished 
   return paragraphs
 
 def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German" ) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
-  #text = read_text_from_file(text_file_path)
-  input_text = read_text_from_file(text_file_path)
-  text = replace_enumeration_separators(input_text) 
+  text = read_text_from_file(text_file_path)
+  #input_text = read_text_from_file(text_file_path)
+  #text = replace_enumeration_separators(input_text) 
   
   language_detection_supported_for_textlanguage = True 
   if LANGUAGE == "en" or LANGUAGE == "de" : 
@@ -359,7 +360,9 @@ def split_string_into_chunks(input_string, chunk_size=500 ) :
   paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_with_single_sc) 
   #paragraphs_finished = convert_to_utf8(paragraphs_nearly_finished) 
   #paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_nearly_finished) 
-  paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_nl)  
+  paragraphs_with_numbers_as_words = convert_numbers_to_words(paragraphs_without_spaces_before_nl, TEXT_LANGUAGE ) 
+  paragraphs_finished = insert_spaces_before_newLine(paragraphs_with_numbers_as_words)  
+  #paragraphs_finished = insert_spaces_before_newLine(paragraphs_without_spaces_before_nl)  
   paragraphs = paragraphs_finished 
   return paragraphs
 
@@ -663,6 +666,140 @@ def replace_enumeration_separators(text):
     except Exception as e:
         print(f"Ein unerwarteter Fehler ist aufgetreten: {str(e)}")
         return text
+
+import re
+from num2words import num2words
+
+def third_old_convert_numbers_to_words(paragraphs, language):
+    output_paragraphs = []
+    
+    for paragraph in paragraphs:
+        try:
+            # Regulärer Ausdruck zum Finden von Zahlen, Dezimalzahlen, Brüchen, Währungssymbolen, 
+            # mathematischen und physikalischen Ausdrücken sowie Sonderzeichen
+            pattern = r'(\d+([.,]\d+)?)|(\d+[/]\d+)|(\d+(?:\.\d+)?(?:,\d+)?\s*(?:€|$|£|¥|%|°|℃|℉|m|km|cm|mm|µm|nm|pm|fm|am|zg|ag|fg|pg|ng|µg|mg|g|kg|t|ml|l|hl|m²|km²|cm²|mm²|µm²|nm²|pm²|fm²|am²|m³|km³|cm³|mm³|µm³|nm³|pm³|fm³|am³|kJ|kcal|eV|J|cal|Nm|dyn|erg|lbf|kp|Wh|kWh|MWh))|([!#$%&*+,-./:;<=>?@^_`{|}~])'
+            
+            # Zahlen und Ausdrücke im Absatz finden
+            numbers = re.findall(pattern, paragraph)
+            
+            for number_tuple in numbers:
+                number = number_tuple[0].strip()
+                
+                if '/' in number:
+                    # Brüche behandeln
+                    numerator, denominator = number.split('/')
+                    number_word = num2words(int(numerator), lang=language) + ' ' + num2words(int(denominator), lang=language, ordinal=True)
+                elif any(char in number for char in ['€', '$', '£', '¥']):
+                    # Währungsbeträge behandeln
+                    number = number.replace(',', '.').replace(' ', '')
+                    if '.' in number:
+                        integer_part, decimal_part = number.split('.')
+                    else:
+                        integer_part, decimal_part = number, '00'
+                    
+                    currency_symbol = next(char for char in ['€', '$', '£', '¥'] if char in number)
+                    integer_word = num2words(int(integer_part), lang=language)
+                    decimal_word = ' '.join(num2words(int(digit), lang=language) for digit in decimal_part)
+                    
+                    number_word = integer_word + ' ' + currency_symbol + ' ' + decimal_word
+                elif any(char in number for char in ['!', '#', '$', '%', '&', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '^', '_', '`', '{', '|', '}', '~']):
+                    # Sonderzeichen behandeln
+                    number_word = ' '.join(num2words(ord(char), lang=language, to='ordinal') for char in number if char.isalnum())
+                else:
+                    # Ganze Zahlen, Dezimalzahlen und physikalische Einheiten behandeln
+                    number = number.replace(',', '.')
+                    if '.' in number:
+                        integer_part, decimal_part = number.split('.')
+                        integer_word = num2words(int(integer_part), lang=language)
+                        decimal_word = ' '.join(num2words(int(digit), lang=language) for digit in decimal_part)
+                        number_word = integer_word + ' Komma ' + decimal_word
+                    else:
+                        number_word = num2words(int(number), lang=language)
+                    
+                    if any(unit in number for unit in ['%', '°', '℃', '℉', 'm', 'km', 'cm', 'mm', 'µm', 'nm', 'pm', 'fm', 'am', 'zg', 'ag', 'fg', 'pg', 'ng', 'µg', 'mg', 'g', 'kg', 't', 'ml', 'l', 'hl', 'm²', 'km²', 'cm²', 'mm²', 'µm²', 'nm²', 'pm²', 'fm²', 'am²', 'm³', 'km³', 'cm³', 'mm³', 'µm³', 'nm³', 'pm³', 'fm³', 'am³', 'kJ', 'kcal', 'eV', 'J', 'cal', 'Nm', 'dyn', 'erg', 'lbf', 'kp', 'Wh', 'kWh', 'MWh']):
+                        unit = next(unit for unit in ['%', '°', '℃', '℉', 'm', 'km', 'cm', 'mm', 'µm', 'nm', 'pm', 'fm', 'am', 'zg', 'ag', 'fg', 'pg', 'ng', 'µg', 'mg', 'g', 'kg', 't', 'ml', 'l', 'hl', 'm²', 'km²', 'cm²', 'mm²', 'µm²', 'nm²', 'pm²', 'fm²', 'am²', 'm³', 'km³', 'cm³', 'mm³', 'µm³', 'nm³', 'pm³', 'fm³', 'am³', 'kJ', 'kcal', 'eV', 'J', 'cal', 'Nm', 'dyn', 'erg', 'lbf', 'kp', 'Wh', 'kWh', 'MWh'] if unit in number)
+                        number_word += ' ' + unit
+                
+                paragraph = paragraph.replace(number, number_word, 1)
+            
+            output_paragraphs.append(paragraph)
+        except (TypeError, ValueError):
+            # Bei Fehlern den ursprünglichen Absatz unverändert hinzufügen
+            output_paragraphs.append(paragraph)
+    
+    return output_paragraphs
+
+
+import re
+from num2words import num2words
+
+def convert_numbers_to_words(paragraphs, language):
+    output_paragraphs = []
+    
+    for paragraph in paragraphs:
+        try:
+            # Regulärer Ausdruck zum Finden von Zahlen und "oder"-Ausdrücken im Text
+            pattern = r'(\d+(\s+oder\s+\d+)*)|(\d+)'
+            
+            # Zahlen und "oder"-Ausdrücke im Absatz finden
+            numbers = re.findall(pattern, paragraph)
+            
+            for number_tuple in numbers:
+                number = number_tuple[0].strip()
+                
+                if ' oder ' in number:
+                    # Bei "oder"-Ausdrücken die Zahlen einzeln konvertieren und mit "oder" verbinden
+                    numbers_list = number.split(' oder ')
+                    converted_numbers = []
+                    
+                    for num in numbers_list:
+                        converted_numbers.append(num2words(int(num), lang=language))
+                    
+                    number_word = ' oder '.join(converted_numbers)
+                else:
+                    number_word = num2words(int(number), lang=language)
+                
+                # Bindestriche durch Leerzeichen ersetzen
+                #number_word = number_word.replace('-', ' ')
+                #number_word = number_word.replace('.', '. ')
+                
+                paragraph = paragraph.replace(number, number_word, 1)
+            
+            output_paragraphs.append(paragraph)
+        except (TypeError, ValueError):
+            # Bei Fehlern den ursprünglichen Absatz unverändert hinzufügen
+            output_paragraphs.append(paragraph)
+    
+    return output_paragraphs
+
+
+import re
+from num2words import num2words
+
+def old_convert_numbers_to_words(paragraphs, language='de' ): 
+    output_paragraphs = []
+    
+    for paragraph in paragraphs:
+        try:
+            # Regulärer Ausdruck zum Finden von Zahlen im Text
+            pattern = r'\d+'
+            
+            # Zahlen im Absatz finden
+            numbers = re.findall(pattern, paragraph)
+            
+            # Jede Zahl in Wörter umwandeln
+            for number in numbers:
+                number_word = num2words(int(number), lang=language ) 
+                #number_word = number_word.replace('-', ' ')
+                paragraph = paragraph.replace(number, number_word)
+            
+            output_paragraphs.append(paragraph)
+        except (TypeError, ValueError):
+            # Bei Fehlern den ursprünglichen Absatz unverändert hinzufügen
+            output_paragraphs.append(paragraph)
+    
+    return output_paragraphs
+
 
 
 
