@@ -3,3 +3,5 @@ TTS
 spacy 
 langdetect 
 flask 
+ollama 
+deepspeed 
