@@ -180,7 +180,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
           #time.sleep(3)
         try: #AE1
           print("The current output_path is : " + output_path )
-          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
+          tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature )
           time.sleep(3) 
           with open(log_file_path, 'a', encoding='utf-8') as log_file:
             log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -201,7 +201,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               #text_to_speak =  translate_text(text_to_speak, translate_to) 
               #time.sleep(3)
             try: #AE2
-              tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
+              tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature )
               time.sleep(3) 
               with open(log_file_path, 'a', encoding='utf-8') as log_file:
                 log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -212,7 +212,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               if LANGUAGE == "en" : 
                 text_to_speak = "Sorry, this paragraphs seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
                 try: #AE2
-                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
+                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature )
                   time.sleep(3) 
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -224,7 +224,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               elif LANGUAGE == "de" : 
                 text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
                 try: #AE2
-                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
+                  tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature )
                   time.sleep(3) 
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -251,7 +251,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
         #time.sleep(3)
       try: #BE1
         print("The current output_path is : " + output_path )
-        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
+        tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature )
         time.sleep(3) 
         with open(log_file_path, 'a', encoding='utf-8') as log_file:
           log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -273,7 +273,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             #text_to_speak =  translate_text(text_to_speak, translate_to) 
             #time.sleep(3)
           try: #BE2
-            tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
+            tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature )
             time.sleep(3) 
             with open(log_file_path, 'a', encoding='utf-8') as log_file:
               log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -284,7 +284,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             if LANGUAGE == "en" : 
               text_to_speak = "Sorry, this paragraphs seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
               try: #AE2
-                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
+                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature )
                 time.sleep(3) 
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                   log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
@@ -296,7 +296,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             elif LANGUAGE == "de" : 
               text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
               try: #AE2
-                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, use_deep_speed=True )
+                tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature )
                 time.sleep(3) 
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                   log_file.write(f"AE1: {output_path}: \n{str(text_to_speak)} ")
