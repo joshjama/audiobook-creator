@@ -126,7 +126,7 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs = paragraphs_finished 
   return paragraphs
 
-def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German", temperature=0.5) : 
+def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German", temperature=0.85) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
   text = read_text_from_file(text_file_path)
