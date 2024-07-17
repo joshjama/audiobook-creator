@@ -407,6 +407,10 @@ def clean_paragraphs(paragraphs):
     cleaned_paragraphs = []
     for paragraph in paragraphs:
         try:
+        
+            # Replace dots : 
+            paragraph = paragraph.replace('...', '--' )
+            paragraph = paragraph.replace('..', '--' )
             for old_char, new_char in replacements.items():
                 #paragraph = re.sub(re.escape(old_char) + r'(\w+)?' + re.escape(old_char), new_char, paragraph)
                 paragraph = paragraph.replace(old_char, new_char)
@@ -799,6 +803,7 @@ def old_convert_numbers_to_words(paragraphs, language='de' ):
             output_paragraphs.append(paragraph)
     
     return output_paragraphs
+
 
 
 
