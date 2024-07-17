@@ -22,6 +22,9 @@ languages_supported = ['German', 'English']
 # Global variable for the selected language
 translate_to = 'German'
 
+# Voice_temperature defines if results are more deterministic or more creative. 
+# a0.0 is as much deterministic while 1.0 ist as much creative. 
+voice_temperature = 0.85 
 
 # Te speaker idxs to select for xtts : 
 speaker_idxs = [
@@ -93,7 +96,7 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global speaker_idx, translate_to, translation_enabled 
+    global speaker_idx, translate_to, translation_enabled, voice_temperature  
     
 
     
@@ -115,34 +118,36 @@ def index():
         #return render_template_string('index.html', languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, error=error_message)
 
     if request.method == 'POST':
-        # Check if the language parameter is present in the form
-        if 'language' in request.form:
-            selected_language = request.form['language']
+       if 'submit_voice_temperature' in request.form:
+          voice_temperature = float(request.form['voice_temperature'])
+       # Check if the language parameter is present in the form
+       if 'language' in request.form:
+          selected_language = request.form['language']
             
-            # Check if the selected language is in the list of supported languages
-            if selected_language in languages_supported:
-                translate_to = selected_language
-            else:
-                # Invalid language selected, set an error message
-                error_message = 'Invalid language selected.'
-                #return render_template('index.html', languages=languages_supported, selected_language=translate_to, error=error_message)
-        else:
+          # Check if the selected language is in the list of supported languages
+          if selected_language in languages_supported:
+             translate_to = selected_language
+          else:
+             # Invalid language selected, set an error message
+             error_message = 'Invalid language selected.'
+             #return render_template('index.html', languages=languages_supported, selected_language=translate_to, error=error_message)
+       else:
             # Language parameter missing in the form, set an error message
-            error_message = 'Language parameter missing.'
-            #return render_template('index.html', languages=languages_supported, selected_language=translate_to, error=error_message)
+          error_message = 'Language parameter missing.'
+          #return render_template('index.html', languages=languages_supported, selected_language=translate_to, error=error_message)
 
 
     if request.method == 'POST':
-        try:
-            selected_speaker = request.form['speaker']
-            if selected_speaker in speaker_idxs:
-                speaker_idx = selected_speaker
-            else:
-                raise ValueError('Ungültiger Sprecher ausgewählt')
-        except KeyError:
-            pass  # Kein Sprecher ausgewählt
-        except ValueError as e:
-            print(f"Fehler: {str(e)}")
+       try:
+          selected_speaker = request.form['speaker']
+          if selected_speaker in speaker_idxs:
+             speaker_idx = selected_speaker
+          else:
+              raise ValueError('Ungültiger Sprecher ausgewählt')
+       except KeyError:
+          pass  # Kein Sprecher ausgewählt
+       except ValueError as e:
+          print(f"Fehler: {str(e)}")
 
     audiobook_folders = [f for f in os.listdir('.') if os.path.isdir(os.path.join('.', f))]
     return render_template_string('''
@@ -211,6 +216,15 @@ def index():
             <input type="text" id="audiobook_name" name="audiobook_name"><br><br>
             <input type="submit" value="Submit">
         </form>
+
+        <form method="POST">
+          <div>
+            <label for="voice_temperature">Voice-Temperature:</label>
+            <input type="text" id="voice_temperature" name="voice_temperature" value="{{ voice_temperature }}" placeholder="default is 0.85">
+          </div>
+          <button type="submit" name="submit_voice_temperature">Submit</button>
+        </form>
+
         <div id="loading" style="display:none;">Processing... Please wait.</div>
         <h2>Generated Audio Files</h2>
         <ul>
@@ -362,17 +376,17 @@ def upload_file():
         print('No text or file provided')
         return 'No text or file provided', 400
 
-    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx, translation_enabled, translate_to ))
+    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx, translation_enabled, translate_to, voice_temperature ))
     thread.start()
     print('File uploaded and processing started')
 
     return redirect(url_for('index'))
 
-def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx='Claribel Dervla', translation_enabled=False, translate_to='German' ):
+def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx='Claribel Dervla', translation_enabled=False, translate_to='German', voice_temperature=0.85 ):
     os.makedirs(audiobook_folder, exist_ok=True)
     try:
         print(f'Starting audiobook creation for {file_path}')
-        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, translate_to )
+        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, translate_to, voice_temperature )
         book_name = audiobook_folder.replace("/", "")  
         book_name = book_name.replace(".", "") 
         audios_path = book_name + "/" 
