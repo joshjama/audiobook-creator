@@ -559,7 +559,8 @@ def convert_to_utf8(sentences):
     for sentence in sentences:
         try:
             # Konvertiere den Satz in UTF-8
-            converted_sentence = sentence.encode('utf-8', errors='strict').decode('utf-8')
+            #converted_sentence = sentence.encode('utf-8', errors='strict').decode('utf-8')
+            converted_sentence = sentence.encode('utf-8', errors='ignore').decode('utf-8')
             converted_sentences.append(converted_sentence)
         except UnicodeEncodeError as e:
             # Fange Kodierungsfehler ab und gib eine Warnung aus
@@ -567,7 +568,11 @@ def convert_to_utf8(sentences):
             print(f"Fehlerdetails: {e}")
             
             # Versuche, den Satz mit einer Ersatzdarstellung für ungültige Zeichen zu konvertieren
-            converted_sentence = sentence.encode('utf-8', errors='replace').decode('utf-8')
+            #converted_sentence = sentence.encode('utf-8', errors='replace').decode('utf-8')
+            #converted_sentence = sentence.encode('utf-8', errors='ignore').decode('utf-8')
+            converted_sentence = sentence 
+
+            
             converted_sentences.append(converted_sentence)
         except Exception as e:
             # Fange alle anderen Ausnahmen ab und gib eine Fehlermeldung aus
