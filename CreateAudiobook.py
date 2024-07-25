@@ -412,6 +412,7 @@ def clean_paragraphs(paragraphs):
             # Replace dots : 
             paragraph = paragraph.replace('...', '--' )
             paragraph = paragraph.replace('..', '--' )
+            paragraph = paragraph.replace('[', '--').replace(']', '').replace('(', '--').replace(')', '').replace('{', '--').replace('}', '') 
             for old_char, new_char in replacements.items():
                 #paragraph = re.sub(re.escape(old_char) + r'(\w+)?' + re.escape(old_char), new_char, paragraph)
                 paragraph = paragraph.replace(old_char, new_char)
