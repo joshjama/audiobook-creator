@@ -122,7 +122,8 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs_with_single_sc = replace_special_characters_following(paragraphs_nearly_finished)
   paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_with_single_sc) 
   paragraphs_with_numbers_as_words = convert_numbers_to_words(paragraphs_without_spaces_before_nl, language_code ) 
-  paragraphs_finished = insert_spaces_before_newLine(paragraphs_with_numbers_as_words)  
+  paragraphs_without_ending_spaces = insert_spaces_before_newLine(paragraphs_with_numbers_as_words)  
+  paragraphs_finished = add_spaces_after_paragraphs(paragraphs_without_ending_spaces)  
   paragraphs = paragraphs_finished 
   return paragraphs
 
@@ -808,6 +809,13 @@ def old_convert_numbers_to_words(paragraphs, language='de' ):
             output_paragraphs.append(paragraph)
     
     return output_paragraphs
+
+def add_spaces_after_paragraphs(paragraphs) : 
+  output_paragraphs = [] 
+  for paragraph in paragraphs : 
+    output_paragraph = paragraph + " " 
+    output_paragraphs.append(output_paragraph) 
+  return output_paragraphs 
 
 
 
