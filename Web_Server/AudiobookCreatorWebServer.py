@@ -14,6 +14,9 @@ ALLOWED_EXTENSIONS = {'txt'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(AUDIOBOOKS_FOLDER, exist_ok=True)
 
+# Global variable to toggle to use the gpu or cpu to generate the tts - audios.. 
+use_gpu = True 
+
 # Global variable to control translation
 translation_enabled = False
 # Supported languages
@@ -96,7 +99,7 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global speaker_idx, translate_to, translation_enabled, voice_temperature  
+    global speaker_idx, translate_to, translation_enabled, voice_temperature, use_gpu 
     
 
     
@@ -117,7 +120,24 @@ def index():
         #return render_template('index.html', languages=l
         #return render_template_string('index.html', languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, error=error_message)
 
+    # toggle gpu : 
+    if 'toggle_gpu' in request.form:
+        toggle_value = request.form['toggle_gpu']
+        
+        if toggle_value == 'on':
+            use_gpu = True
+            print("Toggled GPU-Usage. ")
+            print("Current gpu-ussage : " + str(use_gpu) ) 
+        elif toggle_value == 'off':
+            use_gpu = False
+            print("Toggled GPU-Usage. ")
+            print("Current gpu-ussage : " + str(use_gpu) ) 
+        else:
+            # Invalid toggle value, set an error message
+            error_message = 'Invalid toggle value.'
+            #return render_template('index.html', languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, error=error_message)
     if request.method == 'POST':
+
        if 'submit_voice_temperature' in request.form:
           voice_temperature = float(request.form['voice_temperature'])
        # Check if the language parameter is present in the form
@@ -225,7 +245,18 @@ def index():
           <button type="submit" name="submit_voice_temperature">Submit</button>
         </form>
 
-        <div id="loading" style="display:none;">Processing... Please wait.</div>
+<form method="POST">
+    <div>
+        <input type="radio" id="toggle_on_gpu" name="toggle_gpu" value="on" {% if use_gpu %}checked{% endif %}>
+        <label for="toggle_on_gpu">GPU-Usage On</label>
+    </div>
+    <div>
+        <input type="radio" id="toggle_off_gpu" name="toggle_gpu" value="off" {% if not use_gpu %}checked{% endif %}>
+        <label for="toggle_off_gpu">GPU_Usage Off</label>
+    </div>
+    <input type="submit" value="Toggle_gpu">
+</form>
+
         <h2>Generated Audio Files</h2>
         <ul>
             {% for folder in audiobook_folders %}
@@ -236,7 +267,7 @@ def index():
         </ul>
     </body>
     </html>
-    ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER, speaker_idxs=speaker_idxs, selected_speaker=speaker_idx, languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled )
+    ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER, speaker_idxs=speaker_idxs, selected_speaker=speaker_idx, languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, use_gpu=use_gpu )
 
 @app.route('/files/<folder>')
 def list_files(folder):
@@ -376,17 +407,17 @@ def upload_file():
         print('No text or file provided')
         return 'No text or file provided', 400
 
-    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx, translation_enabled, translate_to, voice_temperature ))
+    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx, translation_enabled, translate_to, voice_temperature, use_gpu ))
     thread.start()
     print('File uploaded and processing started')
 
     return redirect(url_for('index'))
 
-def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx='Claribel Dervla', translation_enabled=False, translate_to='German', voice_temperature=0.85 ):
+def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx='Claribel Dervla', translation_enabled=False, translate_to='German', voice_temperature=0.85, use_gpu=True ):
     os.makedirs(audiobook_folder, exist_ok=True)
     try:
         print(f'Starting audiobook creation for {file_path}')
-        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, translate_to, voice_temperature )
+        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, translate_to, voice_temperature, use_gpu )
         book_name = audiobook_folder.replace("/", "")  
         book_name = book_name.replace(".", "") 
         audios_path = book_name + "/" 

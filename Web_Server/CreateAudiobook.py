@@ -127,7 +127,7 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs = paragraphs_finished 
   return paragraphs
 
-def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German", temperature=0.85) : 
+def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German", temperature=0.85, use_gpu=True ) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
   text = read_text_from_file(text_file_path)
@@ -163,7 +163,21 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
       else: 
         LANGUAGE = "en" 
   index = 0  
-  device = "cuda" if torch.cuda.is_available() else "cpu"
+  
+  if use_gpu == True : 
+    if torch.cuda.is_available():
+      device = "cuda"
+    elif torch.backends.mps.is_available():
+      device = "mps"
+    else:
+      device = "cpu"
+
+    print(f"Using device: {device}")
+
+  else : 
+    device = "cpu" 
+    print(f"Using device: {device}")
+
   tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2").to(device)
   for l_index, chunk in enumerate(text_chunks) :
     chunk_language = detect(chunk) 
