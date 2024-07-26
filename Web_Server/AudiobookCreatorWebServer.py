@@ -103,6 +103,8 @@ def index():
     
 
     
+    create_download_directory() 
+
     if 'toggle' in request.form:
         toggle_value = request.form['toggle']
         
@@ -446,6 +448,14 @@ def download_file(folder, filename):
 
 #@app.route('/toggle_translation', methods=['POST'])
 #def toggle_translation():
+
+def create_download_directory() : 
+    directory_path = os.path.join(os.getcwd(), "Downloads")
+    if not os.path.exists(directory_path) :
+        os.makedirs(directory_path)
+        print(f"Directory '{directory_path}' was created successfully. ")
+    else:
+        print(f"Directory '{directory_path}' does already exist. ")
 
 
 
