@@ -462,7 +462,7 @@ def remove_tabs_from_paragraphs(paragraphs):
             cleaned_paragraphs.append(paragraph)
     return cleaned_paragraphs
 
-def translate_text(text: str, target_language: str, model: str = "llama3") -> str:
+def translate_text(text: str, target_language: str, model: str = "gemma2") -> str:
     """Translates text to the target language using a local Ollama instance."""
     client = Client(host=OLLAMA_URL)
     modelquery = f"Translate the following text exactly, without any changes or adding words, to {target_language}:\n {text}\n Make sure that the meaning of the original text are fully and accurately preserved. Ensure that grammar and spelling of the translation are correct for language {target_language}. Use no additional explanations, and avoid any adjustments that are not strictly necessary to accurately translate the text into {target_language}. Do not add anything, just answer with the translated text. Exceptions from this rules ar not allowed in any case or for any reason! "
