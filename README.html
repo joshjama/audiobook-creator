@@ -506,6 +506,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li>
 <p>A working cuda setup together with a Nvidea-GPU of at least 8 GB of vram.</p>
 </li>
+<li>
+<p>Please note that translation requires at least 16 GB of vram in order to run both, the tts and the large language model for translation (gemma2) at thesame time. If you do not fit this requirement please turn off the gpu-usage on the web-client in order to ensure the creation will succeed.</p>
+</li>
 </ul>
 </div>
 </div>
@@ -648,6 +651,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect2">
 <h3 id="_translation">Translation :</h3>
 <div class="ulist">
+<div class="title">translation :</div>
 <ul>
 <li>
 <p>You can translate texts from english to german and wise versa.</p>
@@ -662,7 +666,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>Just use the toggle-button on the web-frontend.</p>
 </li>
 <li>
-<p>Please keep attension of the outputs as they are currently produced via llama3.</p>
+<p>Please keep attension of the outputs as they are currently produced via gemma2.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -677,6 +681,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </div>
 </li>
+<li>
+<p>Plese note that you will need at least 16 GB of vram in order to perform translation and tts by gpu-support at the same time. If you don&#8217;t fit this requirement just turn off gpu-usage at the web-frontend to ensure that the audiobook-creation will be performed correctly.</p>
+</li>
 </ul>
 </div>
 </div>
@@ -685,7 +692,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-07-08 15:31:08 +0200
+Last updated 2024-07-27 19:45:47 +0200
 </div>
 </div>
 </body>

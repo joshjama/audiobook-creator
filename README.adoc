@@ -21,6 +21,7 @@
 ** You can adjust the url of your ollama-server inside the CreateAudiobook.py. 
 ** $ OLLAMA_URL = 'http://localhost:11434' # For your leptops GPU. 
 * A working cuda setup together with a Nvidea-GPU of at least 8 GB of vram. 
+* Please note that translation requires at least 16 GB of vram in order to run both, the tts and the large language model for translation (gemma2) at thesame time. If you do not fit this requirement please turn off the gpu-usage on the web-client in order to ensure the creation will succeed. 
 
 == Installation :  
 
@@ -75,12 +76,14 @@ Usage :
 
 === Translation : 
 
+.translation : 
 * You can translate texts from english to german and wise versa. 
 * You can translate any other language to English or German. 
 * Please keep in mind that non - supported languages may leed to unusual sentense-splitting. 
 * Just use the toggle-button on the web-frontend. 
-* Please keep attension of the outputs as they are currently produced via llama3.
+* Please keep attension of the outputs as they are currently produced via gemma2. 
 ** Large Language Models can make mistakes. 
 ** Always check importent information. 
 ** Just try it out, translations may be incorrect or missmatching parts of your text. I am working on better results. 
+* Plese note that you will need at least 16 GB of vram in order to perform translation and tts by gpu-support at the same time. If you don't fit this requirement just turn off gpu-usage at the web-frontend to ensure that the audiobook-creation will be performed correctly. 
 
