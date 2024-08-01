@@ -19,11 +19,17 @@ use_gpu = True
 
 # Global variable to control translation
 translation_enabled = False
+
 # Supported languages
 languages_supported = ['German', 'English']
 
 # Global variable for the selected language
-translate_to = 'German'
+target_language = 'German'
+
+# Translation - or other instruction to be used as a instruction for the gpt-model to work with your books text : 
+#text = "<inserted_text>" 
+#INSTRUCTION = f"Translate the following text exactly, without any changes or adding words, to {target_language}:\n {text}\n Make sure that the meaning of the original text are fully and accurately preserved. Ensure that grammar and spelling of the translation are correct for language {target_language}. Use no additional explanations, and avoid any adjustments that are not strictly necessary to accurately translate the text into {target_language}. Do not add anything, just answer with the translated text. Exceptions from this rules ar not allowed in any case or for any reason! "
+INSTRUCTION = "" 
 
 # Voice_temperature defines if results are more deterministic or more creative. 
 # a0.0 is as much deterministic while 1.0 ist as much creative. 
@@ -99,7 +105,7 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    global speaker_idx, translate_to, translation_enabled, voice_temperature, use_gpu 
+    global speaker_idx, target_language, translation_enabled, voice_temperature, use_gpu, INSTRUCTION  
     
 
     
@@ -115,12 +121,12 @@ def index():
         else:
             # Invalid toggle value, set an error message
             error_message = 'Invalid toggle value.'
-            #return render_template('index.html', languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, error=error_message)
+            #return render_template('index.html', languages=languages_supported, selected_language=target_language, translation_enabled=translation_enabled, error=error_message)
     else:
         # Toggle parameter missing in the form, set an error message
         error_message = 'Toggle parameter missing.'
         #return render_template('index.html', languages=l
-        #return render_template_string('index.html', languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, error=error_message)
+        #return render_template_string('index.html', languages=languages_supported, selected_language=target_language, translation_enabled=translation_enabled, error=error_message)
 
     # toggle gpu : 
     if 'toggle_gpu' in request.form:
@@ -137,8 +143,10 @@ def index():
         else:
             # Invalid toggle value, set an error message
             error_message = 'Invalid toggle value.'
-            #return render_template('index.html', languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, error=error_message)
+            #return render_template('index.html', languages=languages_supported, selected_language=target_language, translation_enabled=translation_enabled, error=error_message)
     if request.method == 'POST':
+       if 'instruction' in request.form:
+          INSTRUCTION = request.form['instruction']
 
        if 'submit_voice_temperature' in request.form:
           voice_temperature = float(request.form['voice_temperature'])
@@ -148,15 +156,15 @@ def index():
             
           # Check if the selected language is in the list of supported languages
           if selected_language in languages_supported:
-             translate_to = selected_language
+             target_language = selected_language
           else:
              # Invalid language selected, set an error message
              error_message = 'Invalid language selected.'
-             #return render_template('index.html', languages=languages_supported, selected_language=translate_to, error=error_message)
+             #return render_template('index.html', languages=languages_supported, selected_language=target_language, error=error_message)
        else:
             # Language parameter missing in the form, set an error message
           error_message = 'Language parameter missing.'
-          #return render_template('index.html', languages=languages_supported, selected_language=translate_to, error=error_message)
+          #return render_template('index.html', languages=languages_supported, selected_language=target_language, error=error_message)
 
 
     if request.method == 'POST':
@@ -215,6 +223,15 @@ def index():
 
 <p>Translation Enabled: {{ translation_enabled }}</p>
 
+    <h1> Alternative model instructions : </h1>
+    <br> Type here, if you want the model to do someting different with your text, eg summerization or logical analyses. </br> 
+<form action="{{ url_for('index') }}" method="post">
+    <label for="instruction">Instruction:</label><br>
+    <textarea id="instruction" name="instruction" rows="5" cols="50">{{ INSTRUCTION }}</textarea><br>
+    <input type="submit" value="Submit">
+</form>
+
+
     <h1>Select Speaker</h1>
     <form method="post">
         <label for="speaker-select">Speaker:</label>
@@ -269,7 +286,7 @@ def index():
         </ul>
     </body>
     </html>
-    ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER, speaker_idxs=speaker_idxs, selected_speaker=speaker_idx, languages=languages_supported, selected_language=translate_to, translation_enabled=translation_enabled, use_gpu=use_gpu )
+    ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER, speaker_idxs=speaker_idxs, selected_speaker=speaker_idx, languages=languages_supported, selected_language=target_language, translation_enabled=translation_enabled, use_gpu=use_gpu, INSTRUCTION=INSTRUCTION )
 
 @app.route('/files/<folder>')
 def list_files(folder):
@@ -409,17 +426,17 @@ def upload_file():
         print('No text or file provided')
         return 'No text or file provided', 400
 
-    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx, translation_enabled, translate_to, voice_temperature, use_gpu ))
+    thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx, translation_enabled, target_language, voice_temperature, use_gpu, INSTRUCTION ))
     thread.start()
     print('File uploaded and processing started')
 
     return redirect(url_for('index'))
 
-def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx='Claribel Dervla', translation_enabled=False, translate_to='German', voice_temperature=0.85, use_gpu=True ):
+def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx='Claribel Dervla', translation_enabled=False, target_language='German', voice_temperature=0.85, use_gpu=True, instruction=INSTRUCTION ):
     os.makedirs(audiobook_folder, exist_ok=True)
     try:
         print(f'Starting audiobook creation for {file_path}')
-        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, translate_to, voice_temperature, use_gpu )
+        create_audio_tts(file_path, text_language, audiobook_folder, speaker_idx, translation_enabled, target_language, voice_temperature, use_gpu, INSTRUCTION )
         book_name = audiobook_folder.replace("/", "")  
         book_name = book_name.replace(".", "") 
         audios_path = book_name + "/" 

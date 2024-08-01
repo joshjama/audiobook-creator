@@ -127,7 +127,7 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs = paragraphs_finished 
   return paragraphs
 
-def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German", temperature=0.85, use_gpu=True ) : 
+def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_idx='Claribel Dervla', translation_enabled=False, translate_to="German", temperature=0.85, use_gpu=True, instruction="" ) : 
   create_directory_from_book_name(book_name)
   log_file_path = os.path.join(book_name, "audio_files_log.txt")
   text = read_text_from_file(text_file_path)
@@ -144,7 +144,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
     # Testing : 
     #translation_enabled == True 
     if translation_enabled == True : 
-      text_chunks_translated = translate_text_chunks(text_chunks, translate_to, True ) 
+      text_chunks_translated = translate_text_chunks(text_chunks, translate_to, True, instruction ) 
       text_chunks = []
       text_chunks = text_chunks_translated 
       time.sleep(10)
@@ -462,16 +462,23 @@ def remove_tabs_from_paragraphs(paragraphs):
             cleaned_paragraphs.append(paragraph)
     return cleaned_paragraphs
 
-def translate_text(text: str, target_language: str, model: str = "gemma2") -> str:
+def translate_text(text: str, target_language: str, model: str = "gemma2", instruction="") -> str:
     """Translates text to the target language using a local Ollama instance."""
     client = Client(host=OLLAMA_URL)
-    modelquery = f"Translate the following text exactly, without any changes or adding words, to {target_language}:\n {text}\n Make sure that the meaning of the original text are fully and accurately preserved. Ensure that grammar and spelling of the translation are correct for language {target_language}. Use no additional explanations, and avoid any adjustments that are not strictly necessary to accurately translate the text into {target_language}. Do not add anything, just answer with the translated text. Exceptions from this rules ar not allowed in any case or for any reason! "
+    if instruction == "" : 
+      modelquery = f"Translate the following text exactly, without any changes or adding words, to {target_language}:\n {text}\n Make sure that the meaning of the original text are fully and accurately preserved. Ensure that grammar and spelling of the translation are correct for language {target_language}. Use no additional explanations, and avoid any adjustments that are not strictly necessary to accurately translate the text into {target_language}. Do not add anything, just answer with the translated text. Exceptions from this rules ar not allowed in any case or for any reason! "
+    else : 
+      text_binding = " You are forced to use the following text as input. Other actions are not permitted. Here comes the text you have to work on : " 
+      modelquery = instruction + text_binding  + text 
+      
     
     try:
         print("Starting Translation. ")
         print("Translating your text into : " + target_language )
         print("Original Text : " )
         print(text)
+        #print("modelquery : " + modelquery ) 
+        print("Instruction : " + instruction )
         translation = ollama.generate(model=model, prompt=modelquery, stream=False)
         print ('##TRANSLATION: '+ translation['response'])
         del model
@@ -483,11 +490,11 @@ def translate_text(text: str, target_language: str, model: str = "gemma2") -> st
         print(f"Exception details: {e}")
         return text
 
-def translate_text_chunks(text_chunks, target_language, language_support ) -> list : 
+def translate_text_chunks(text_chunks, target_language, language_support, instruction="" ) -> list : 
 
   translated_chunks = []
   for chunk in text_chunks : 
-    translated_chunk = translate_text(chunk, target_language ) 
+    translated_chunk = translate_text(chunk, target_language, instruction=instruction ) 
     translated_chunks.append(translated_chunk)  
 
   translated_text = "" 
