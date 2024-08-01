@@ -30,6 +30,14 @@
 * $ ./install_requirements.sh  
 * Please note that you have to run the create_audiobook.sh ones after installation in order to be able to axcept the license. 
 
+.Additional ollama installation : 
+* For translation and additional instructions to do suffisticated things with your texts, a large language model is required. 
+* I am useing ollama with google - gemma2 to perform this additional work. 
+* Get ollama with the following command : 
+* $ curl -fsSL https://ollama.com/install.sh | sh 2>&1
+* then pull the gemma2 modell from ollama-library : 
+* $ ollama pull gemma2 
+
 == Usage :  
 
 Usage :
@@ -86,4 +94,13 @@ Usage :
 ** Always check importent information. 
 ** Just try it out, translations may be incorrect or missmatching parts of your text. I am working on better results. 
 * Plese note that you will need at least 16 GB of vram in order to perform translation and tts by gpu-support at the same time. If you don't fit this requirement just turn off gpu-usage at the web-frontend to ensure that the audiobook-creation will be performed correctly. 
+
+.Alternative Instructions : 
+* You can give alternative instructions for the gpt-model to process your text. 
+* Just type your instruction into the textfeeld <Alternative Instructions> and press submit. 
+** Please note! For Alternative instructions do need the same resources and dependencies the translationfeature needs. 
+* You will have ollama up and running with gemma2. 
+* From summarization to logical analyses is everything possible. 
+** Please note that some instructions will be to complex for gemma2. Considder to use larger models for more complicated tasks, like logical analyses or strong reasoning. 
+* All gpt-s are used to make mistakes from time to time. Please dubblecheck importent information! 
 
