@@ -102,7 +102,7 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   current_chunk = ""
     
   for sent in doc.sents:
-    if len(current_chunk) + len(sent.text) <= max_length_chunk or len(sent.text) > max_length_chunk:
+    if len(current_chunk) + len(sent.text) <= max_length_chunk :  
       current_chunk += sent.text + " "
     else:
       paragraphs.append(current_chunk.strip())
