@@ -862,12 +862,12 @@ def monitor_cpu_temp():
     temp_as_int = int(float(temp)) 
     if temp is not None:
         print(f"Current CPU temperature: {temp:.2f}°C")
-        if temp_as_int > 90:
-            print("Warning: CPU temperature exceeds 90°C. Introducing a 10-second pause.")
+        if temp_as_int >= 80:
+            print("Warning: CPU temperature exceeds 80°C. Introducing a 10-second pause.")
             time.sleep(10)
     else:
         print("Unable to read CPU temperature. Retrying in 5 seconds.")
-        time.sleep(5)
+        time.sleep(10)
 
 
 
