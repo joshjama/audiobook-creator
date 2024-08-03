@@ -5,3 +5,4 @@ langdetect
 flask 
 ollama 
 deepspeed 
+psutil 
