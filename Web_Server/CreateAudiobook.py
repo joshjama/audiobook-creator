@@ -1,5 +1,6 @@
 import sys 
 import os 
+import psutil
 import time 
 import traceback
 import re
@@ -195,6 +196,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
           #time.sleep(3)
         try: #AE1
           print("The current output_path is : " + output_path )
+          monitor_cpu_temp() 
           tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, speed=1.2 )
           time.sleep(3) 
           with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -216,6 +218,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               #text_to_speak =  translate_text(text_to_speak, translate_to) 
               #time.sleep(3)
             try: #AE2
+              monitor_cpu_temp() 
               tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, speed=1.2 )
               time.sleep(3) 
               with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -227,6 +230,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               if LANGUAGE == "en" : 
                 text_to_speak = "Sorry, this paragraphs seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
                 try: #AE2
+                  monitor_cpu_temp() 
                   tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, speed=1.2 )
                   time.sleep(3) 
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -239,6 +243,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
               elif LANGUAGE == "de" : 
                 text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
                 try: #AE2
+                  monitor_cpu_temp() 
                   tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, speed=1.2 )
                   time.sleep(3) 
                   with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -266,6 +271,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
         #time.sleep(3)
       try: #BE1
         print("The current output_path is : " + output_path )
+        monitor_cpu_temp() 
         tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, speed=1.2 )
         time.sleep(3) 
         with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -288,6 +294,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             #text_to_speak =  translate_text(text_to_speak, translate_to) 
             #time.sleep(3)
           try: #BE2
+            monitor_cpu_temp() 
             tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, speed=1.2 )
             time.sleep(3) 
             with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -299,6 +306,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             if LANGUAGE == "en" : 
               text_to_speak = "Sorry, this paragraphs seams to be to long. I am not able to read it. It may be that it is a long list of bibliographic information. Please check your spelling. " 
               try: #AE2
+                monitor_cpu_temp() 
                 tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, speed=1.2 )
                 time.sleep(3) 
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -311,6 +319,7 @@ def create_audio_tts(text_file_path, LANGUAGE, book_name="Audiobook", speaker_id
             elif LANGUAGE == "de" : 
               text_to_speak = "Entschuldigung, Diese Sätze scheinen zu lang zur sein, um sie lesen zu können. Es könnte sich um eine sehr lange bibliographische Auflistung, oder ein Inhaltsverzeichnis handeln. Bitte achte außerdem darauf, das deine Zeichensetzung im Text korrekt ist. "
               try: #AE2
+                monitor_cpu_temp() 
                 tts.tts_to_file(text=text_to_speak, file_path=output_path, speaker=speaker_idx, language=LANGUAGE, temperature=temperature, speed=1.2 )
                 time.sleep(3) 
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
@@ -838,6 +847,29 @@ def add_spaces_after_paragraphs(paragraphs) :
     output_paragraph = paragraph + " " 
     output_paragraphs.append(output_paragraph) 
   return output_paragraphs 
+
+
+def get_cpu_temp():
+    try:
+        temp = psutil.sensors_temperatures(fahrenheit=False)['coretemp'][0].current
+        return temp
+    except (KeyError, AttributeError):
+        print("Error: Unable to read CPU temperature.")
+        return None
+
+def monitor_cpu_temp():
+    temp = get_cpu_temp()
+    temp_as_int = int(float(temp)) 
+    if temp is not None:
+        print(f"Current CPU temperature: {temp:.2f}°C")
+        if temp_as_int > 90:
+            print("Warning: CPU temperature exceeds 90°C. Introducing a 10-second pause.")
+            time.sleep(10)
+    else:
+        print("Unable to read CPU temperature. Retrying in 5 seconds.")
+        time.sleep(5)
+
+
 
 
 
