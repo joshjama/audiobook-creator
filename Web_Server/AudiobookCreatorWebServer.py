@@ -3,6 +3,7 @@ import sys
 import threading
 import traceback
 from flask import Flask, request, render_template_string, send_from_directory, redirect, url_for
+from flask import request, render_template_string, send_file
 from werkzeug.utils import secure_filename
 from CreateAudiobook import create_audio_tts, TEXT_LANGUAGE
 from RenameAudios import * 
@@ -290,6 +291,78 @@ def index():
 
 @app.route('/files/<folder>')
 def list_files(folder):
+    files = os.listdir(os.path.join(AUDIOBOOKS_FOLDER, folder))
+    files.sort()  # Sort files to ensure correct order
+
+    page = int(request.args.get('page', 1))
+    per_page = 50  # Number of files to display per page
+    start_index = (page - 1) * per_page
+    end_index = start_index + per_page
+
+    paginated_files = files[start_index:end_index]
+
+    return render_template_string('''
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ folder }}</title>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var audioElements = document.querySelectorAll('audio');
+                for (let i = 0; i < audioElements.length - 1; i++) {
+                    audioElements[i].addEventListener('ended', function() {
+                        var nextAudioElement = audioElements[i + 1];
+                        if (nextAudioElement) {
+                            nextAudioElement.play();
+                        } else {
+                            // If the current audio is the last one on the page, load the next page
+                            var currentPage = {{ page }};
+                            var totalPages = {{ total_pages }};
+                            if (currentPage < totalPages) {
+                                var nextPage = currentPage + 1;
+                                window.location.href = "{{ url_for('list_files', folder=folder, page=nextPage) }}";
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <h1>{{ folder }}</h1>
+        <ul>
+            {% for file in files %}
+                <li>
+                    <audio controls>
+                        <source src="{{ url_for('download_file', folder=folder, filename=file) }}" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <a href="{{ url_for('download_file', folder=folder, filename=file) }}" target="_blank">{{ file }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        
+        {% if total_pages > 1 %}
+            <div>
+                {% if page > 1 %}
+                    <a href="{{ url_for('list_files', folder=folder, page=page-1) }}">Previous</a>
+                {% endif %}
+
+                Page {{ page }} of {{ total_pages }}
+
+                {% if page < total_pages %}
+                    <a href="{{ url_for('list_files', folder=folder, page=page+1) }}">Next</a>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <a href="{{ url_for('index') }}">Back to home</a>
+    </body>
+    </html>
+    ''', folder=folder, files=paginated_files, page=page, total_pages=(len(files) + per_page - 1) // per_page)
+
+def list_files_working(folder):
     files = os.listdir(os.path.join(AUDIOBOOKS_FOLDER, folder))
     files.sort()  # Sort files to ensure correct order
     return render_template_string('''
