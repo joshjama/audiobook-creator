@@ -87,6 +87,10 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
       max_length_chunk = avg_length_paragraphs 
       while max_length_chunk < 500: 
         max_length_chunk += max_length_chunk 
+#    while max_length_chunk < 400 : 
+#       max_length_chunk += avg_length_paragraphs 
+#    while max_length_chunk > 400: 
+#        max_length_chunk -= avg_length_paragraphs 
 
     print(f"The chunk length is: {max_length_chunk}")
   except MemoryError:
@@ -123,7 +127,8 @@ def split_text_into_paragraphs(text: str, max_length_chunk: int = 500 ) -> list:
   paragraphs_with_single_sc = replace_special_characters_following(paragraphs_nearly_finished)
   paragraphs_without_spaces_before_nl = convert_to_utf8(paragraphs_with_single_sc) 
   paragraphs_with_numbers_as_words = convert_numbers_to_words(paragraphs_without_spaces_before_nl, language_code ) 
-  paragraphs_without_ending_spaces = insert_spaces_before_newLine(paragraphs_with_numbers_as_words)  
+  paragraphs_with_reduced_spaces = clean_paragraphs(paragraphs_with_numbers_as_words) 
+  paragraphs_without_ending_spaces = insert_spaces_before_newLine(paragraphs_with_reduced_spaces)  
   paragraphs_finished = add_spaces_after_paragraphs(paragraphs_without_ending_spaces)  
   paragraphs = paragraphs_finished 
   return paragraphs
@@ -436,6 +441,8 @@ def clean_paragraphs(paragraphs):
             paragraph = paragraph.replace('...', '--' )
             paragraph = paragraph.replace('..', '--' )
             paragraph = paragraph.replace('[', '--').replace(']', '').replace('(', '--').replace(')', '').replace('{', '--').replace('}', '') 
+            # Reduce dubbleed spaces and replace them with a single space : 
+            paragraph = reduce_spaces(paragraph) 
             for old_char, new_char in replacements.items():
                 #paragraph = re.sub(re.escape(old_char) + r'(\w+)?' + re.escape(old_char), new_char, paragraph)
                 paragraph = paragraph.replace(old_char, new_char)
@@ -868,6 +875,11 @@ def monitor_cpu_temp():
     else:
         print("Unable to read CPU temperature. Retrying in 5 seconds.")
         time.sleep(10)
+
+def reduce_spaces(text):
+    words = text.split()
+    return ' '.join(words)
+
 
 
 
