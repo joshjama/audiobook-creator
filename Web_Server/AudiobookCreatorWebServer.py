@@ -99,7 +99,62 @@ speaker_idxs = [
 ] 
 
 #Speaker to select via drop-down : 
-speaker_idx = ''
+#speaker_idx = ''
+speaker_idx='Claribel Dervla'
+
+SHOW_AUDIOBOOK_GENERATION_STARTED_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiobook Generation Started</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+        }
+        .message {
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">
+        <p>The generation of the new audiobook has started. You can find a folder with the new audiobook on the homepage under "Generated Audiobooks".</p>
+        <p>Please note that the creation of the audiobook can take a long time. However, you can start listening to the audiobook by tapping on the folder and then pressing the play button next to the corresponding file.</p>
+        <p>During the generation process, the files may be displayed in the wrong order. After the generation is complete, the files will be renumbered, and a zip file containing correctly numbered MP3 files will be offered for download in the audiobook folder.</p>
+    </div>
+    <form action="{{ url_for('audiobook_generation_started') }}" method="post">
+        <button type="submit" class="button">OK</button>
+    </form>
+</body>
+</html>
+"""
+
+@app.route('/audiobook-generation-started', methods=['GET', 'POST'])
+def audiobook_generation_started():
+    if request.method == 'POST':
+        return redirect(url_for('index'))
+    return render_template_string(AUDIOBOOK_GENERATION_STARTED_TEMPLATE)
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -194,7 +249,32 @@ def index():
         </script>
     </head>
     <body>
-    <h1>Language Selection</h1>
+
+    <h1> Audiobook Creator </h1>
+        <h2>Text to Audiobook</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
+            <label for="text">Enter text:</label><br>
+            <textarea id="text" name="text" rows="10" cols="50"></textarea><br><br>
+            <label for="file">Or upload a text file:</label><br>
+            <input type="file" id="file" name="file"><br><br>
+            <label for="audiobook_name">Audiobook Name:</label><br>
+            <input type="text" id="audiobook_name" name="audiobook_name"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+
+        <h2>Generated Audio Files</h3>
+
+        <ul>
+            {% for folder in audiobook_folders %}
+                <li>
+                    <a href="{{ url_for('list_files', folder=folder) }}">{{ folder }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+    <h1> Settings : </h2> 
+
+    <h2>Language Selection</h2>
     
     {% if error %}
         <p style="color: red;">{{ error }}</p>
@@ -224,7 +304,7 @@ def index():
 
 <p>Translation Enabled: {{ translation_enabled }}</p>
 
-    <h1> Alternative model instructions : </h1>
+    <h2> Alternative model instructions : </h2>
     <br> Type here, if you want the model to do someting different with your text, eg summerization or logical analyses. </br> 
 <form action="{{ url_for('index') }}" method="post">
     <label for="instruction">Instruction:</label><br>
@@ -233,7 +313,7 @@ def index():
 </form>
 
 
-    <h1>Select Speaker</h1>
+    <h2>Select Speaker</h2>
     <form method="post">
         <label for="speaker-select">Speaker:</label>
         <select name="speaker" id="speaker-select">
@@ -246,16 +326,7 @@ def index():
         <input type="submit" value="Select">
     </form>
 
-        <h1>Text to Audiobook</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data" onsubmit="showLoading()">
-            <label for="text">Enter text:</label><br>
-            <textarea id="text" name="text" rows="10" cols="50"></textarea><br><br>
-            <label for="file">Or upload a text file:</label><br>
-            <input type="file" id="file" name="file"><br><br>
-            <label for="audiobook_name">Audiobook Name:</label><br>
-            <input type="text" id="audiobook_name" name="audiobook_name"><br><br>
-            <input type="submit" value="Submit">
-        </form>
+
 
         <form method="POST">
           <div>
@@ -277,14 +348,6 @@ def index():
     <input type="submit" value="Toggle_gpu">
 </form>
 
-        <h2>Generated Audio Files</h2>
-        <ul>
-            {% for folder in audiobook_folders %}
-                <li>
-                    <a href="{{ url_for('list_files', folder=folder) }}">{{ folder }}</a>
-                </li>
-            {% endfor %}
-        </ul>
     </body>
     </html>
     ''', audiobook_folders=audiobook_folders, os=os, AUDIOBOOKS_FOLDER=AUDIOBOOKS_FOLDER, speaker_idxs=speaker_idxs, selected_speaker=speaker_idx, languages=languages_supported, selected_language=target_language, translation_enabled=translation_enabled, use_gpu=use_gpu, INSTRUCTION=INSTRUCTION )
@@ -330,7 +393,7 @@ def list_files(folder):
         </script>
     </head>
     <body>
-        <h1>{{ folder }}</h1>
+        <h2>{{ folder }}</h2>
         <ul>
             {% for file in files %}
                 <li>
@@ -383,7 +446,7 @@ def list_files_working(folder):
         </script>
     </head>
     <body>
-        <h1>{{ folder }}</h1>
+        <h2>{{ folder }}</h2>
         <ul>
             {% for file in files %}
                 <li>
@@ -411,7 +474,7 @@ def list_files_old_old(folder):
         <title>{{ folder }}</title>
     </head>
     <body>
-        <h1>{{ folder }}</h1>
+        <h2>{{ folder }}</h2>
         <ul>
             <audio controls>
                 {% for file in files %}
@@ -440,7 +503,7 @@ def list_files_old(folder):
         <title>{{ folder }}</title>
     </head>
     <body>
-        <h1>{{ folder }}</h1>
+        <h2>{{ folder }}</h2>
         <ul>
             {% for file in files %}
                 <li>
@@ -499,13 +562,17 @@ def upload_file():
         print('No text or file provided')
         return 'No text or file provided', 400
 
+    
+    # Audiobook creation will be started here : 
     thread = threading.Thread(target=create_audio_tts_with_logging, args=(file_path, TEXT_LANGUAGE, audiobook_folder, speaker_idx, translation_enabled, target_language, voice_temperature, use_gpu, INSTRUCTION ))
     thread.start()
     print('File uploaded and processing started')
 
-    return redirect(url_for('index'))
+    return render_template_string(SHOW_AUDIOBOOK_GENERATION_STARTED_TEMPLATE) 
+    #return redirect(url_for('index'))
 
 def create_audio_tts_with_logging(file_path, text_language, audiobook_folder, speaker_idx='Claribel Dervla', translation_enabled=False, target_language='German', voice_temperature=0.85, use_gpu=True, instruction=INSTRUCTION ):
+
     os.makedirs(audiobook_folder, exist_ok=True)
     try:
         print(f'Starting audiobook creation for {file_path}')
